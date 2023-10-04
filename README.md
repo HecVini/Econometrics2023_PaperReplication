@@ -6,7 +6,7 @@
  #### Geral 
 [ ] Definir paper a ser replicado\
 [ ] Reunião para decidir o que cada um vai fazer\
-[ ] Definir boas práticas para seguirmos no trabalho. Caso contrário, vamos ter muito retrabalho.\
+[ ] Definir boas práticas para seguirmos no trabalho. Caso contrário, vamos ter muito retrabalho.
  
  #### Individuais
  **Vini**
