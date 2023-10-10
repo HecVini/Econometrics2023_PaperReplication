@@ -35,7 +35,7 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
   Colocar nessa seção o que for descobrindo e entendendo do paper. A ideia é compartilhar com o grupo as suas descobertas.
   
 <font size = 2> 
-- Paper antigos em que o modelo usado é desenvolvido: Epple e Sieg (1998); Epple e Sieg (1999).
+- Paper antigos em que o modelo usado é desenvolvido: Epple e Sieg (1998); Epple e Sieg (1999). <br>
 - Material que a Sophie usou para apresentar isso está linkado aqui em cima, sob nome de "SophieLecture_HouseMarket". <br>
  <font>
 
