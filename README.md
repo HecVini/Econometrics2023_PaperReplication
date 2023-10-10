@@ -37,7 +37,6 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
 <font size = 2> 
 - Paper antigos em que o modelo usado é desenvolvido: Epple e Sieg (1998); Epple e Sieg (1999).
 - Material que a Sophie usou para apresentar isso está linkado aqui em cima, sob nome de "SophieLecture_HouseMarket". <br>
-- casd
  <font>
 
 ## Boas práticas
