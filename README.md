@@ -2,7 +2,7 @@
 # Econometrics 2023: Paper Replication
  Econometrics 2023 paper replication project repository. We will gather all codes and resources here.
 
-Hoje é dia 10 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **28** dias!
+Hoje é dia 12 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **26** dias!
 
  ## Tarefas a serem cumpridas
 Resumo do que decidimos que tem que ser feito ao longo do projeto.
@@ -19,7 +19,7 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
    ##### Reunião 1: 10 de Outubro
    <font size = 2> 
    Pautas: <br>
-   - Definimos que teremos 2 dias para estudar melhor o paper. Na pior das hipóteses buscar algo de GMM na Review of Economic Studies (talvez). <br>
+   - Definimos que teremos 2 dias para estudar melhor o paper. Na pior das hipóteses buscar algo de GMM na AER ou Review of Economic Studies (talvez). <br>
    - Divisão dos dois grupos: econometria e dados <br>
    <br>
    Tarefas:<br>
@@ -53,4 +53,6 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
  * [Econometrics with R](https://www.econometrics-with-r.org/)
  <font size = 2> Nesse site tem uns 20 capítulos sobre econometria com R e um mar de exemplos. <font>
  * [Pacotes interessantes para R](https://github.com/HecVini/AwesomePackages)
+ * [VPN da FGV](https://epge.fgv.br/we/TsAcad)
+ * [Censos históricos dos EUA](https://usa.ipums.org/usa/index.shtml)
 
