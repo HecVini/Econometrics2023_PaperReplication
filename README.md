@@ -2,13 +2,13 @@
 # Econometrics 2023: Paper Replication
  Econometrics 2023 paper replication project repository. We will gather all codes and resources here.
 
-Hoje é dia 12 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **26** dias!
+Hoje é dia 17 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **21** dias!
 
  ## Tarefas a serem cumpridas
 Resumo do que decidimos que tem que ser feito ao longo do projeto.
 
 <font size = 2> 
-[ ] Definir paper a ser replicado. Para isso, ver se é factível (até 13/10). <br>
+[x] Definir paper a ser replicado. Para isso, ver se é factível (até 13/10). <br>
 [x] Reunião inicial para decidir o que cada um vai fazer <br>
 [x] Definir boas práticas para seguirmos no trabalho. Caso contrário, vamos ter muito retrabalho. Ver seção sobre isso no fim desse documento. <br>
 
