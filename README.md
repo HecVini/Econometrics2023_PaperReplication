@@ -14,6 +14,7 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
 [ ] Limpar base de dados orignal do paper <br>
 [ ] Entender o modelo estrutural <br>
 [ ] Entender arquivos em Stata e Matlab usados
+[x] Colocar todo o replication package no repositório
 
 <font>
 
