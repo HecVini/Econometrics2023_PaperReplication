@@ -11,10 +11,15 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
 [x] Definir paper a ser replicado. Para isso, ver se é factível (até 13/10). <br>
 [x] Reunião inicial para decidir o que cada um vai fazer <br>
 [x] Definir boas práticas para seguirmos no trabalho. Caso contrário, vamos ter muito retrabalho. Ver seção sobre isso no fim desse documento. <br>
-[ ] Limpar base de dados orignal do paper <br>
+[x] Limpar base de dados orignal do paper <br>
 [ ] Entender o modelo estrutural <br>
 [ ] Entender arquivos em Stata e Matlab usados
 [x] Colocar todo o replication package no repositório
+[ ] Traduzir pasta 1 de *Programs*
+[ ] Traduzir pasta 2 de *Programs*
+[ ] Traduzir pasta 3 de *Programs*
+[ ] Traduzir pasta 4 de *Programs*
+
 
 <font>
 
