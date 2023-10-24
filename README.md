@@ -2,7 +2,7 @@
 # Econometrics 2023: Paper Replication
  Econometrics 2023 paper replication project repository. We will gather all codes and resources here.
 
-Hoje é dia 19 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **19** dias!
+Hoje é dia 24 de outubro. Temos que entregar tudo no dia 07 de novembro. Faltam **14** dias!
 
  ## Tarefas a serem cumpridas
 Resumo do que decidimos que tem que ser feito ao longo do projeto.
@@ -31,7 +31,25 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
    - Kaio e João: para 13/10, ler a econometria do modelo e ver se é factível. Se sim, resumir como funciona para ser colocado no Readme do projeto. <br>
    - Kaio: para 13/10, ler Epple e Seig (1999) e entender o framework desse tipo de modelo. <br>
    <br>
-   Próxima reunião: sexta, 13/10, pela manhã via Zoom.
+   
+   ##### Reunião 2: 24 de Outubro
+   <font size = 2> 
+   Pautas: <br>
+   - Cada um disse o que fez durante a última semana. <br>
+   - Explicações sobre a divisão dos arquivos a serem traduzidos da pasta "Structural Model Estimation". <br>
+   - Nos organizamos para fazer as traduções da pasta *programs* para R
+   <br>
+   Tarefas:<br>
+   - Vini e Alex: para 26/10, traduzir a pasta *UserCostWithEquity*. <br>
+   - Kaio , João e Guilherme: terminar de traduzir a pasta *StructuralModelEstiamtion*. <br>
+   - Alex: terminar de traduzir as pastas *Calculate Data Correlations* e *Wage Premium Movers ACS* (rápido). <br>
+   - Entregar para Sophie na quinta-feira: <br>
+  [ ] Income e Rent em Chicago (ver p. 975). <br>
+  [ ] Primeiras 3 linhas da tabela 6 <br>
+  [ ] Figura 1 do apêncide estatístico 
+	  
+   <br>
+   
    <font>
 
  
@@ -41,6 +59,7 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
 <font size = 2> 
 - Paper antigos em que o modelo usado é desenvolvido: Epple e Sieg (1998); Epple e Sieg (1999). <br>
 - Material que a Sophie usou para apresentar isso está linkado aqui em cima, sob nome de "SophieLecture_HouseMarket". <br>
+- O replication package tem duas grandes pastas: data e programs. "Data" tem as bases de dados que eles usaram. "Programs", os códigos que eles usaram para estimar o modelo. 
  <font>
 
 ## Boas práticas
@@ -59,4 +78,5 @@ Resumo do que decidimos que tem que ser feito ao longo do projeto.
  * [Pacotes interessantes para R](https://github.com/HecVini/AwesomePackages)
  * [VPN da FGV](https://epge.fgv.br/we/TsAcad)
  * [Censos históricos dos EUA](https://usa.ipums.org/usa/index.shtml)
+ * [Link para a planilha da pasta do modelo estrutural]( https://1drv.ms/x/s!Agt5TP4Y6pztg4MFCHWpbkmZAGgWwQ?e=2RZ4qD)
 
