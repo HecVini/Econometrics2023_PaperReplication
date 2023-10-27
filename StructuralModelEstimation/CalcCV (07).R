@@ -1,7 +1,7 @@
 # Calculate the compensating variation required to keep utility that guarantees the same utility for a household 
 # that moves from the reference m metro area to the base metro area.
 # yphat is the resulting total income and cv is the compensating variation (the additional amount)
-
+library(neldermead)
 CalcCV <- function(y,uph,v,vm,hg){  
 
 	opts = optimset(MaxFunEvals = 200, MaxIter = 200, TolFun = 1e-5, TolX = 1e-20)
