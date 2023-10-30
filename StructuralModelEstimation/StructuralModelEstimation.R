@@ -1,6 +1,8 @@
-install.packages('dplyr')
-install.packages('neldermead')
-install.packages("pracma", "signal")
+#install.packages('dplyr')
+#install.packages('neldermead')
+#install.packages("pracma")
+#install.packages("signal")
+
 # This function loads the data to estimate the model in Dennis, Quintero and Sieg (2019) with 1 metro area.
 
 a1loadinitialdata_1ma <- function(WPmetro) {
@@ -33,9 +35,9 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   inicut<-2
   begy<-2
   beg<-3
-  hg<-VI$V(beg:length(VI$V)-inicut)
-  Ycut<-YI$Y(begy:length(VI$Y)-inicut)
-  Ytcut<-YI$Yt(begy:length(VI$Yt)-inicut)
+  hg<-VI$V[beg:(length(VI$V)-inicut)]
+  Ycut<-YI$Y[begy:length(VI$Y)-inicut]
+  Ytcut<-YI$Yt[begy:length(VI$Yt)-inicut]
 
   px<-list()
   pxx<-list()
@@ -150,15 +152,15 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   u4<- u1
   u5 <- u1
 
-  u2$alpha <- u2$alpha+runif()/10
-  u3$alpha <- u3$alpha+runif()/10
-  u4$alpha <- u4$alpha+runif()/10
-  u5$alpha <- u5$alpha+runif()/10
+  u2$alpha <- u2$alpha+runif(1)/10
+  u3$alpha <- u3$alpha+runif(1)/10
+  u4$alpha <- u4$alpha+runif(1)/10
+  u5$alpha <- u5$alpha+runif(1)/10
 
-  u2$gamma <- u2$gamma-runif()/10
-  u3$gamma <- u3$gamma-runif()/10
-  u4$gamma <- u4$gamma-runif()/10
-  u5$gamma <- u5$gamma-runif()/10
+  u2$gamma <- u2$gamma-runif(1)/10
+  u3$gamma <- u3$gamma-runif(1)/10
+  u4$gamma <- u4$gamma-runif(1)/10
+  u5$gamma <- u5$gamma-runif(1)/10
 
 
   v01 <- log(hg)
@@ -194,30 +196,35 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   zeta0 <- log(0.065)
 
   Q<-function(p_hat){
+    upi<-list()
     upi$alpha <- p_hat[1]
     upi$phi <- p_hat[2]*100
     upi$eta <- p_hat[3]*1000
     upi$gamma <- p_hat[4]/10
     upi$kappa <- p_hat[5]*1000
 
+    upii<-list()
     upii$alpha <- p_hat[6]
     upii$phi <- p_hat[7]*100
     upii$eta <- p_hat[8]*1000
     upii$gamma <- p_hat[9]/10
     upii$kappa <- p_hat[10]*1000
 
+    upiii<-list()
     upiii$alpha <- p_hat[11]
     upiii$phi <- p_hat[12]*100
     upiii$eta <- p_hat[13]*1000
     upiii$gamma <- p_hat[14]/10
     upiii$kappa <- p_hat[15]*1000
 
+    upiv<-list()
     upiv$alpha <- p_hat[16]
     upiv$phi <- p_hat[17]*100
     upiv$eta <- p_hat[18]*1000
     upiv$gamma <- p_hat[19]/10
     upiv$kappa <- p_hat[20]*1000
 
+    upv<-list()
     upv$alpha <- p_hat[21]
     upv$phi <- p_hat[22]*100
     upv$eta <- p_hat[23]*1000
@@ -246,7 +253,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
     cons5 <- utilconpositive(upv,hg)
 
 
-    if (cons1>0 & cons2>0 & cons3>0 & cons4>0 & cons5>0 & upi$alpha>0 & upii$alpha>0 &
+    if (all(cons1>0) & all(cons2>0) & all(cons3>0) & all(cons4>0) & all(cons5>0) & upi$alpha>0 & upii$alpha>0 &
         upiii$alpha>0  & upiv$alpha>0 & upv$alpha>0 & upi$gamma<0 & upii$gamma<0 & upiii$gamma<0 &
         upiv$gamma<0 & upv$gamma<0 & upi$phi>0 & upii$phi>0 & upiii$phi>0 & upiv$phi>0 & upv$phi>0 &
         upi$eta>0 & upii$eta>0 & upiii$eta>0 & upiii$eta>0 & upiii$eta>0 & sum(p1)>0 & sum(p2)>0 &
@@ -305,7 +312,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
 
   iter <-50
   for (i in 1:iter){
-    hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0)-1], pr0[2,1:length(pr0)-1], pr0[3,1:length(pr0)-1], zeta0), Q,control=opts)
+    hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
     phat<-hat$par
     Ehat<-hat$value
     u01 <- c(phat[1], phat[2], phat[3], phat[4], phat[5])
@@ -339,7 +346,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
     iter <-1+iter
   }
 
-  hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0)-1], pr0[2,1:length(pr0)-1], pr0[3,1:length(pr0)-1], zeta0), Q,control=opts)
+  hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
   phat<-hat$par
   Ehat<-hat$value
 
@@ -521,7 +528,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   PIh$elast$ehp1iv <- ehp1iv
   PIh$elast$ehp1v <- ehp1v
 
-  return(list(PIh,Ehat))
+  return(list('PIh'=PIh,'Ehat'=Ehat))
 }
 
 #Função que estima os parâmetros do modelo usando ambas as regiões metropolitanas e suas correlações
@@ -547,12 +554,12 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   inicut<-2
   begy<-2
   beg<-3
-  hg<-VI$V(beg:length(VI$V)-inicut)
-  Ycut<-YI$Y(begy:length(VI$Y)-inicut)
-  Ytcut<-YI$Yt(begy:length(VI$Yt)-inicut)
+  hg<-VI$V[beg:(length(VI$V)-inicut)]
+  Ycut<-YI$Y[begy:length(VI$Y)-inicut]
+  Ytcut<-YI$Yt[begy:length(VI$Yt)-inicut]
 
-  Ycutm<-YIm$Y(begy:length(VI$Y)-inicut)
-  Ytcutm<-YIm$Yt(begy:length(VI$Yt)-inicut)
+  Ycutm<-YIm$Y[begy:length(VI$Y)-inicut]
+  Ytcutm<-YIm$Yt[begy:length(VI$Yt)-inicut]
 
   px<-list()
   pxx<-list()
@@ -757,15 +764,15 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   u4<- u1
   u5 <- u1
 
-  u2$alpha <- u2$alpha+runif()/10
-  u3$alpha <- u3$alpha+runif()/10
-  u4$alpha <- u4$alpha+runif()/10
-  u5$alpha <- u5$alpha+runif()/10
+  u2$alpha <- u2$alpha+runif(1)/10
+  u3$alpha <- u3$alpha+runif(1)/10
+  u4$alpha <- u4$alpha+runif(1)/10
+  u5$alpha <- u5$alpha+runif(1)/10
 
-  u2$gamma <- u2$gamma-runif()/10
-  u3$gamma <- u3$gamma-runif()/10
-  u4$gamma <- u4$gamma-runif()/10
-  u5$gamma <- u5$gamma-runif()/10
+  u2$gamma <- u2$gamma-runif(1)/10
+  u3$gamma <- u3$gamma-runif(1)/10
+  u4$gamma <- u4$gamma-runif(1)/10
+  u5$gamma <- u5$gamma-runif(1)/10
 
 
   v01 <- log(hg)
@@ -965,7 +972,7 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
 
   iter <-30
   for (i in 1:iter){
-    hat <- optim(c(u01, u02, u03, u04, u05, v02,v01m,v02m, pr0[1,1:length(pr0)-1], pr0[2,1:length(pr0)-1], pr0[3,1:length(pr0)-1], zeta0), Q,control=opts)
+    hat <- optim(c(u01, u02, u03, u04, u05, v02,v01m,v02m, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
     phat<-hat$par
     Ehat<-hat$value
     u01 <- c(phat[1], phat[2], phat[3], phat[4], 0)
@@ -1000,7 +1007,7 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
 
   }
 
-  hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0)-1], pr0[2,1:length(pr0)-1], pr0[3,1:length(pr0)-1], zeta0), Q,control=opts)
+  hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
   phat<-hat$par
   Ehat<-hat$value
 
@@ -1278,7 +1285,7 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   PIh$CV$ycv<-ycv[1:length(ycv)-1]
   PIh$CV$CV<-CV[1:length(CV)-1]
 
-  return(list(PIh,Ehat))
+  return(list('PIh'=PIh,'Ehat'=Ehat))
 }
 
 # This function loads the data to estimate the model in Dennis, Quintero and Sieg (2019) with 1 metro area.
@@ -1306,7 +1313,7 @@ a3loadinitialdata_2ma <- function(WPmetro, WPmetrom, WPAgr) {
 library(neldermead)
 CalcCV <- function(y,uph,v,vm,hg){
 
-  opts = optimset(MaxFunEvals = 200, MaxIter = 200, TolFun = 1e-5, TolX = 1e-20)
+  opts<-list(abstol=1e-4,reltol=1e-4,maxit=5000)
 
   c(utest, htest, vtest)   <- caluy(y,uph,v,hg)
 
@@ -1317,7 +1324,7 @@ CalcCV <- function(y,uph,v,vm,hg){
     c(uh,hh,vh)   <- caluy(exp(yp),uph,v,hg)
 
     if (imag(um)==0 & imag(uh)==0){
-      F <- (um-uh).^2
+      F <- (um-uh)**2
     } else {
       F <- 1000000000000000
     }
@@ -1325,7 +1332,9 @@ CalcCV <- function(y,uph,v,vm,hg){
   }
 
   ypini <- y
-  [yp_hat ,fval] <- fminsearch(CV,log(ypini),opts)
+  yp <- optim(log(ypini),CV,control=opts)
+  yp_hat<-yp$par
+  fval<-yp$value
   yphat <- exp(yp_hat)
   cv <- yphat - y
 
@@ -1335,9 +1344,12 @@ CalcCV <- function(y,uph,v,vm,hg){
   eta <- uph$eta
   kappa <- uph$kappa
 
-  [uhat,hhat,vhat] <- caluy(yphat,uph,v,hg)
+  caly<- caluy(yphat,uph,v,hg)
+  uhat<-caly$u
+  hhat<-caly$h
+  vhat<-caly$vh
   utility(yphat,hh,phi,gamma,alpha,eta,kappa,vh)
-  return(c(yphat, cv,fval))
+  return(list('yphat'=yphat, 'cv'=cv,'fval'=fval))
 }
 
 # This calculates the preference parameters implied by a single type model.
@@ -1379,7 +1391,7 @@ caluy <- function(y,uph,v,hg){
   # What is the quality that a household with income y would consume?
   yh <- Ycutoff(hg,uph,v)
 
-  diff_squared <- (yh - y)^2
+  diff_squared <- (yh - y)**2
   b <- which.min(diff_squared)
   a <- min(diff_squared)
   h <- hg(b)
@@ -1393,7 +1405,8 @@ caluy <- function(y,uph,v,hg){
   kappa <- uph.kappa
 
   u <- utility(y,h,phi,gamma,alpha,eta,kappa,vh);
-  return(c(u,h,vh))
+
+  return(list('u'=u,'h'=h,'vh'=vh))
 }
 
 # This function evaluates the GLN4 cdf distribution. See appendix of Dennis, Quintero and Sieg (2019).
@@ -1422,7 +1435,7 @@ cdfGLN4 <- function(x, mediancdforig, mu, sigma, r, beta) {
     # If x[i] + beta is less than mediancdforig, the cdf is less than 0.5
     if (x[i] + beta < mediancdforig) {
       menor <- 1
-      B[i] <- ((mu - log(x[i] + beta) / sigma)^r) / r
+      B[i] <- ((mu - log(x[i] + beta) / sigma)**r) / r
       T[i] <- B[i]
       F[i] <- gamma(v) * pgamma(B[i], shape = v, lower.tail = FALSE) / (2 * gamma(v))
     }
@@ -1436,7 +1449,7 @@ cdfGLN4 <- function(x, mediancdforig, mu, sigma, r, beta) {
     # If x[i] + beta is greater than mediancdforig, the cdf is greater than 0.5
     if (x[i] + beta > mediancdforig) {
       mayor <- 1
-      M[i] <- ((log(x[i] + beta) - mu) / sigma)^r / r
+      M[i] <- ((log(x[i] + beta) - mu) / sigma)**r / r
       T[i] <- M[i]
       F[i] <- 0.5 + gamma(v) * pgamma(M[i], shape = v) / (2 * gamma(1/r))
     }
@@ -1450,11 +1463,11 @@ deriv_dy_dh_FOC <- function(h,alpha,phi,gammap,eta,vp,vpp){
   #     vp = Vprime_GLN4(h,mu,sigma,tau,omega,phi,gammap,alpha,eta);
   #     vpp = Vdoubleprime_GLN4(h,mu,sigma,tau,omega,phi,gammap,alpha,eta);
   heta <- h+eta
-  TT <- vp*(1-phi*((heta)^gammap))
-  TTp <- vpp*(1-phi*(heta^gammap)) + vp*(-phi*gammap*(heta^(gammap-1)))
-  B <- -phi*gammap*alpha*(heta^(gammap-1))
-  Bp <- -phi*gammap*alpha*(gammap-1)*(heta^(gammap-2))
-  Dydh <- ((TTp*B - Bp*TT)/(B^2)) + vp
+  TT <- vp*(1-phi*((heta)**gammap))
+  TTp <- vpp*(1-phi*(heta**gammap)) + vp*(-phi*gammap*(heta**(gammap-1)))
+  B <- -phi*gammap*alpha*(heta**(gammap-1))
+  Bp <- -phi*gammap*alpha*(gammap-1)*(heta**(gammap-2))
+  Dydh <- ((TTp*B - Bp*TT)/(B**2)) + vp
 
   return(Dydh)
 }
@@ -1473,7 +1486,7 @@ dp_dh_FOC_linearVh<-function(h,eta,alpha,phi,gammap,y,kappa){
 # Derivative dy_dh from the FOCs, when pricing function is linear
 deriv_dy_dh_FOC_linearVh <- function(h,p,alpha,phi,gammap,eta){
   S <- -p/(alpha*phi*gammap)
-  M <- (h+eta)^(-gammap)
+  M <- (h+eta)**(-gammap)
   L <- -alpha*phi*gammap -phi + (1 - gammap) * M
   return(S*L)
 
@@ -1489,7 +1502,7 @@ GLN4quantiles <- function(p, mediancdforig, mu, sigma, r, beta) {
   # Define the objective function
   GLN4quant <- function(q, beta) {
     if (-1000 * beta < exp(q)) {
-      F <- (cdfGLN4(exp(q), mediancdforig, mu, sigma, r, beta) - p)^2
+      F <- (cdfGLN4(exp(q), mediancdforig, mu, sigma, r, beta) - p)**2
     } else {
       F <- 1e15  # A large value to discourage q values that are too small
     }
@@ -2293,7 +2306,7 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
   # Corresponding values
   for (j in 1:length(h)) {
     # t=1
-    d1 <- (v1[j] - V$V[2:length(V$V)])^2
+    d1 <- (v1[j] - V$V[2:length(V$V)])**2
     b1 <- which.min(d1)
 
     # V$k1ypolyf gives the user cost estimated as in equation 32. This
@@ -2309,7 +2322,7 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
     test[j] <- v1[j] - V$V[b1]
 
     # t=2
-    d2 <- (v2[j] - V$Vt[2:length(V$Vt)])^2
+    d2 <- (v2[j] - V$Vt[2:length(V$Vt)])**2
     b2 <- which.min(d2)
 
     if (b2 > length(V$k2ypolyf)) {
@@ -2345,9 +2358,9 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
 
   # t=2
   # Calculate approx pdf
-  # We have q2 = q1(V2/V1)^(zeta*Pt) houses of quality h1 in the second period.
+  # We have q2 = q1(V2/V1)**(zeta*Pt) houses of quality h1 in the second period.
   vratioV <- (V2 / V1)
-  vratioh <- (V2 / V1)^(Pt * zeta)
+  vratioh <- (V2 / V1)**(Pt * zeta)
   q2 <- q1 * (vratioh[1:(length(vratioh) - 1)])
   q2e <- q1e * vratioh[length(vratioh)]
   q2t <- q1t * vratioh
@@ -2367,15 +2380,15 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
 
   # Growth Rate
   vratioV <- (V2 / V1)
-  vratioh <- (V2 / V1)^(Pt * zeta)
+  vratioh <- (V2 / V1)**(Pt * zeta)
 
-  grateV <- (vratioV)^(1 / Pt) - 1
-  grateh <- (vratioh)^(1 / Pt) - 1
+  grateV <- (vratioV)**(1 / Pt) - 1
+  grateh <- (vratioh)**(1 / Pt) - 1
 
   meangrateV <- sum(grateV * r2t)
   meangrateh <- sum(grateh * r2t)
 
-  return(list(R2 = R2, N2 = N2, grateh = grateh))
+  return(list('R2' = R2, 'N2' = N2, 'grateh' = grateh))
 }
 
 # Calculate Supply for the 2 metro areas model for the second or reference metro area,
@@ -2401,7 +2414,7 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
   # Corresponding values
   for (j in 1:length(h)) {
     # t=1
-    d1 <- (v1[j] - Vbase$V[2:length(Vbase$V)])^2
+    d1 <- (v1[j] - Vbase$V[2:length(Vbase$V)])**2
     b1 <- which.min(d1)
 
     # k1ypolyf and k2ypolyf give the user cost estimated as in equation 32. This
@@ -2417,7 +2430,7 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
     test[j] <- v1[j] - Vbase$V[b1]
 
     # t=2
-    d2 <- (v2[j] - Vref$Vt[2:length(Vref$Vt)])^2
+    d2 <- (v2[j] - Vref$Vt[2:length(Vref$Vt)])**2
     b2 <- which.min(d2)
 
     if (b2 > length(Vref$k2ypolyf)) {
@@ -2454,9 +2467,9 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
 
   # t=2
   # Calculate approx pdf
-  # We have q2 = q1(V2/V1)^(zeta*Pt) houses of quality h1 in the second period.
+  # We have q2 = q1(V2/V1)**(zeta*Pt) houses of quality h1 in the second period.
   vratioV <- (V2 / V1)
-  vratioh <- (V2 / V1)^(Pt * zeta)
+  vratioh <- (V2 / V1)**(Pt * zeta)
   q2 <- q1 * (vratioh[1:(length(vratioh) - 1)])
   q2e <- q1e * vratioh[length(vratioh)]
   q2t <- q1t * vratioh
@@ -2476,10 +2489,10 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
 
   # Growth Rate
   vratioV <- (V2 / V1)
-  vratioh <- (V2 / V1)^(Pt * zeta)
+  vratioh <- (V2 / V1)**(Pt * zeta)
 
-  grateV <- (vratioV)^(1 / Pt) - 1
-  gratehm <- (vratioh)^(1 / Pt) - 1
+  grateV <- (vratioV)**(1 / Pt) - 1
+  gratehm <- (vratioh)**(1 / Pt) - 1
 
   meangrateV <- sum(grateV * r2t)
   meangrateh <- sum(gratehm * r2t)
@@ -2490,7 +2503,7 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
 #Calculates if utility of housing component is well defined for the normalization in equation (26)
 utilconpositive <- function(up, hg) {
   # Order: alpha, phi, eta, gamma, kappa
-  c <- 1 - up$phi * ((hg + up$eta) ^ up$gamma) - 0.001 # Compute nonlinear inequalities at x.
+  c <- 1 - up$phi * ((hg + up$eta)**up$gamma) - 0.001 # Compute nonlinear inequalities at x.
   # ceq <- []
   # Compute nonlinear equalities at x.
   return(c)
@@ -2499,7 +2512,7 @@ utilconpositive <- function(up, hg) {
 # Evaluate the utility function in equation 26 for an income of y, a
 # consumption of housing of h at prices v
 utility <- function(y,h,phi,gamma,alpha,eta,kappa, v){
-  A <- log(1-phi*((h+eta)^gamma))
+  A <- log(1-phi*((h+eta**gamma)))
   B <- (1/alpha)*log(y-v-kappa)
   U <- A + B
   return(U)
@@ -2513,11 +2526,11 @@ Vhinvert <- function(v,con,muy,sigy,tau,omg,phi,gam,alpha,eta){
   a <- muy-(sigy/tau)*omg
   A <- exp(a)
   b <- (sigy/tau)
-  F <- 1-((v^(1-b))/A)
+  F <- 1-((v**(1-b))/A)
   Ffirst <- F(1,1)
   C <- exp((b-1)*con)
-  Z <- (F/C)^(1/((b-1)*alpha))
-  h <- ((1-Z)/phi)^(1/gam)-eta
+  Z <- (F/C)**(1/((b-1)*alpha))
+  h <- ((1-Z)/phi)**(1/gam)-eta
   return(h)
 }
 
@@ -2528,9 +2541,9 @@ VhinvertGLN4 <- function(v,muy,sigma,tau,omega,phi,gammap,alpha,eta,theta){
   A <- exp(a)
   b <- (sigma/tau)
   vtheta <- v+theta
-  F <- 1-((vtheta^(1-b))/A)
-  S <- F^(1/(alpha*(b-1)))
-  Z <- ((1-S)/phi)^(1/gammap)
+  F <- 1-((vtheta**(1-b))/A)
+  S <- F**(1/(alpha*(b-1)))
+  Z <- ((1-S)/phi)**(1/gammap)
   h <- Z-eta;
 
   return(h)
@@ -2539,7 +2552,7 @@ VhinvertGLN4 <- function(v,muy,sigma,tau,omega,phi,gammap,alpha,eta,theta){
 #Income as a function of quality, obtained from the FOCs, when pricing function is linear
 y_FOC_linearVh <- function(h,p,alpha,phi,gammap,eta,kappa){
   S <- p/(alpha*phi*gammap)
-  A <- ((h+eta)^(-gammap))-phi
+  A <- ((h+eta)**(-gammap))-phi
   M <- S*(h+eta)*A
   y <- kappa + p*h - M
   return(y)
@@ -2548,8 +2561,8 @@ y_FOC_linearVh <- function(h,p,alpha,phi,gammap,eta,kappa){
 #Income as a function of quality, obtained from the FOCs
 y_FOC_Vh <- function(h,alpha,phi,gammap,eta,kappa,v,vp){
   heta <- (h+eta)
-  S <- 1 - phi*(heta^gammap)
-  L <- -phi*gammap*alpha*(heta^(gammap-1))
+  S <- 1 - phi*(heta**gammap)
+  L <- -phi*gammap*alpha*(heta**(gammap-1))
   M <- (vp*(S))/(L)
   y <- kappa + v + M
   return(y)
@@ -2559,16 +2572,16 @@ y_FOC_Vh <- function(h,alpha,phi,gammap,eta,kappa,v,vp){
 #Variáveis: h (vetor de qualidades), v(vetor de aluguéis) e up (lista nomeada dos valores dos parâmetros da função de utilidade)
 
 Ycutoff<-function(h,up,v){
-  s=log(1-up['phi']*((h+up['eta'])**up['gamma']))
+  s=log(1-up$phi*((h+up$eta)**up$gamma))
   E<-c()
   L<-c()
   M<-c()
   ycf<-c()
   for (i in 1:(length(h)-1)){
-    E<-c(E, exp((s[i+1]-s[i])*up['alpha']))
+    E<-c(E, exp((s[i+1]-s[i])*up$alpha))
     L<-c(L, 1-E[i])
     M<-c(M, v[i]-E[i]*v[i+1])
-    ycf<-c(ycf, (M[i]/L[i])+up['kappa'])
+    ycf<-c(ycf, (M[i]/L[i])+up$kappa)
   }
   return(unname(ycf))
 }
@@ -2645,7 +2658,7 @@ Yvcorrelations <- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv
 
     # Locate in the matrix cum_prix
 
-    locate <-(draw - cum_prix)^2
+    locate <-(draw - cum_prix)**2
     c(a, b) <-min(locate)
 
     c(c, xdraw) <-min(a)
@@ -2718,17 +2731,18 @@ Yvcorrelations <- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv
   corrtyv_xxx <-cor(ytcfxxx,vtcfxxx)
 
 
-  difx <- (corryv_x(1,1) - Corr$corr_x1)^2
-  diftx <- (corrtyv_x(1,1) - Corr$corrt_x1)^2
+  difx <- (corryv_x(1,1) - Corr$corr_x1)**2
+  diftx <- (corrtyv_x(1,1) - Corr$corrt_x1)**2
 
-  difxx <- (corryv_xx(1,1) - Corr$corr_x2)^2
-  diftxx <- (corrtyv_xx(1,1) - Corr$corrt_x2)^2
+  difxx <- (corryv_xx(1,1) - Corr$corr_x2)**2
+  diftxx <- (corrtyv_xx(1,1) - Corr$corrt_x2)**2
 
-  difxxx <- (corryv_xxx(1,1) - Corr$corr_x3)^2
-  diftxxx <- (corrtyv_xxx(1,1) - Corr$corrt_x3)^2
+  difxxx <- (corryv_xxx(1,1) - Corr$corr_x3)**2
+  diftxxx <- (corrtyv_xxx(1,1) - Corr$corrt_x3)**2
 
   M <-100* sum(c(difx, diftx, difxx, diftxx, difxxx, diftxxx))
   return(M)
 }
+
 
 
