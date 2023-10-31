@@ -1443,9 +1443,10 @@ cdfGLN4 <- function(x, mediancdforig, mu, sigma, r, beta) {
     # If x[i] + beta is less than mediancdforig, the cdf is less than 0.5
     if (x[i] + beta < mediancdforig) {
       menor <- 1
-      B[i] <- ((mu - log(x[i] + beta) / sigma)**r) / r
+      B[i] <- (((mu - log(x[i] + beta)) / sigma)**r) / r
       T[i] <- B[i]
       F[i] <- gamma(v) * pgamma(B[i], shape = v, lower.tail = FALSE) / (2 * gamma(v))
+
     }
 
     # If x[i] + beta is equal to mediancdforig, the cdf is equal to 0.5
@@ -1461,9 +1462,11 @@ cdfGLN4 <- function(x, mediancdforig, mu, sigma, r, beta) {
       T[i] <- M[i]
       F[i] <- 0.5 + gamma(v) * pgamma(M[i], shape = v) / (2 * gamma(1/r))
     }
+
   }
 
   # Return the cdf vector
+
   return(F)
 }
 
@@ -1721,7 +1724,7 @@ hd <-function(pxy,pxxy,pxxxy,si,sii,siii,pi,ycf){
   #Calculate the demand for each quality j = 1:J implied by the income
   #cutoffs ycf. ycf gives the cutoff points that make households
   #indifferent between quality j and j-1 given qualities J and prices v
-  
+  hd <- c()
   mux <- pxy[1]
   sigmax <- pxy[2]
   rx <- pxy[3]
@@ -1745,28 +1748,20 @@ hd <-function(pxy,pxxy,pxxxy,si,sii,siii,pi,ycf){
   GLNyxxj_1 <- cdfGLN4(ycf[1:length(ycf)-1],exp(muxx),muxx,sigmaxx,rxx,betaxx)
   GLNyxxxj_1 <- cdfGLN4(ycf[1:length(ycf)-1],exp(muxxx),muxxx,sigmaxxx,rxxx,betaxxx)
 
-
   #Get the income distribution for each unobserved type evaluated at the income
   #cutoffs
   # contemporaneous
-  
-  # o problema esta nessas dimensoes, acho que Fi deve ser 1x12 para funcionar
-  # volte ao codigo origial/sua tradução pq modifiquei aqui tentando consertar
-  # acho que parte do problema pode ser no R vendo esses vetores diferentes do matlab
-  
-  #s <- matrix(c(si, sii, siii))
+
   s <- c(si, sii, siii)
-  #pi <- matrix(pi)
-  #F <- c(t(GLNyxj), t(GLNyxxj), t(GLNyxxxj))
   F <- matrix(c(GLNyxj, GLNyxxj, GLNyxxxj), ncol = length(ycf) - 1, byrow = TRUE)
-  D <- sum(s*pi)
-  N <- diag(s*pi)%*%F
+  D <- sum(s*pi) #produto escalar, correto
+  N <- (s*pi)%*%F #o termo entre parenteses é a diagonal da matriz, um vetor 1x3, que deve ser multiplicado por um 3x12
   Fi <-  N/D
-  print(Fi)
+  Fi <- c(Fi)
 
   # lagged
-  F_1 <- matrix(c(t(GLNyxj_1), t(GLNyxxj_1), t(GLNyxxxj_1)), ncol = length(ycf) - 1, byrow = TRUE)
-  N_1 <- diag(t(t(s)%*%pi))*F_1
+  F_1 <- matrix(c(GLNyxj_1, GLNyxxj_1, GLNyxxxj_1), ncol = length(ycf) - 1, byrow = TRUE)
+  N_1 <- (s*pi)%*%F_1
   Fi_1 <-  N_1/D
   # demands are the difference between the two cumulative income
   # distributions
@@ -1784,8 +1779,22 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
 
   # Rh from the normalization that sets v(h) = v
   ## Calculate supply and demand in t=1
-  c(Rh,Hdcdi,Hdcdii,Hdcdiii,Hdcdiv,Hdcdv,Hx,Hxx,Hxxx,AgHdcdf,cond1) <-
-    Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)
+  
+  lista = list()
+  lista$Rh <- Rh_3x5Ilinearvh$h
+  lista$Hdcdi <-Rh_3x5Ilinearvh$Hdcdi
+  lista$Hdcdii <- Rh_3x5Ilinearvh$Hdcdii
+  lista$Hdcdiii <- Rh_3x5Ilinearvh$Hdcdiii
+  lista$Hdcdiv <- Rh_3x5Ilinearvh$Hdcdiv
+  lista$Hdcdv <- Rh_3x5Ilinearvh$Hdcdv
+  lista$Hx <- Rh_3x5Ilinearvh$Hx
+  lista$Hxx <- Rh_3x5Ilinearvh$Hxx
+  lista$Hxxx <- Rh_3x5Ilinearvh$Hxxx
+  lista$AgHdcdf <- Rh_3x5Ilinearvh$AgHdcdf
+  lista$cond1 <- Rh_3x5Ilinearvh$cond
+  
+  #c(Rh,Hdcdi,Hdcdii,Hdcdiii,Hdcdiv,Hdcdv,Hx,Hxx,Hxxx,AgHdcdf,cond1) <-
+    #Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)
 
   if (cond1 ==1){
     ## Check monotonicity
@@ -2190,8 +2199,8 @@ Rh_3x5Ilinearvh <- function(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,si,sii,siii
     cond=0
   }
   Rh <- AgHdcdf
-  return(c(Rh,Hdcdi,Hdcdii,Hdcdiii,Hdcdiv,Hdcdv, Hx, Hxx, Hxxx,AgHdcdf,cond))
-
+  return(list('Rh' = Rh,'Hdcdi' = Hdcdi,'Hdcdii' = Hdcdii, 'Hdcdiii' = Hdcdiii, 'Hdcdiv' = Hdcdiv,
+  'Hdcdv' = Hdcdv, 'Hx' = Hx, 'Hxx' = Hxx, 'Hxxx' = Hxxx, 'AgHdcdf' = AgHdcdf, 'cond' = cond))
 }
 
 # Calculate aggregate demand and demand for each observed and unobserved type
