@@ -4,8 +4,10 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
 
   # Rh from the normalization that sets v(h) = v
   ## Calculate supply and demand in t=1
-  c(Rh,Hdcdi,Hdcdii,Hdcdiii,Hdcdiv,Hdcdv,Hx,Hxx,Hxxx,AgHdcdf,cond1) <-
-  Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)                     
+  Rhlinear <-Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)
+  for(i in names(Rhlinear)){
+    assign(i,Rhlinear[[i]])
+  }
   
   if (cond1 ==1){
     ## Check monotonicity
@@ -13,8 +15,11 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
   
     if  (monov) {
       ## Demand for period 2
-      c(Hdtcdi,Hdtcdii,Hdtcdiii,Hdtcdiv,Hdtcdv,Htx, Htxx, Htxxx,AgHdtcdf,cond2) <- Rh_3x5Ivh(h,pxyt,pxxyt,pxxxyt,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3, vp2)
-  
+      Rh_3 <-Rh_3x5Ivh(h,pxyt,pxxyt,pxxxyt,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3, vp2)
+      for(i in names(Rh_3)){
+        assign(i,Rh_3[[i]])
+      }
+      
       if (cond2 ==1){
         ## Supply for period 2
         
@@ -26,11 +31,14 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
   
         # linear function for price of first period
         vp1 <- t(h)
-        c(Rh2, N2, grateh) <-RhSl2PeriodsI(h,vp1,vp2,VI,zeta,AgHdcdf,lengthper)
-      } else {
-        Rh2= vector()
-        N2= vector() 
-        grateh = vector()  
+        Rhsl2P <-RhSl2PeriodsI(h,vp1,vp2,VI,zeta,AgHdcdf,lengthper)
+        for(i in names(Rhsl2P)){
+          assign(i,Rhsl2P[[i]])
+        }      
+        } else {
+        Rh2<- vector()
+        N2<- vector() 
+        grateh<- vector()  
       }      
     } else { 
   
@@ -66,5 +74,8 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
       cond2=0
   }
 
-  return(c(Rh,cond1,cond2,Hdcdi,Hdcdii,Hdcdiii,Hdcdiv,Hdcdv,Hx, Hxx, Hxxx,AgHdcdf,Hdtcdi,Hdtcdii,Hdtcdiii,Hdtcdiv,Hdtcdv,Htx, Htxx, Htxxx,AgHdtcdf, Rh2))
+  return(list('Rh'=Rh,'cond1'=cond1,'cond2'=cond2,'Hdcdi'=Hdcdi,'Hdcdii'=Hdcdii,'Hdcdiii'=Hdcdiii,'Hdcdiv'=Hdcdiv,'Hdcdv'=Hdcdv,'Hx'=Hx,'Hxx'=Hxx,'Hxxx'=Hxxx,'AgHdcdf'=AgHdcdf,
+              'Hdtci'=Hdtcdi,'Hdtcii'=Hdtcdii,'Hdtciii'=Hdtcdiii,'Hdtciv'=Hdtcdiv,'Hdtcv'=Hdtcdv,'Htx'=Htx, 'Htxx'=Htxx,'Htxxx'=Htxxx,'AgHdtcdf'=AgHdtcdf, 'Rh2'=Rh2))
 }
+Rhh<-Hinv3x5INorm1(...)
+Rhh$Rh, Rhh$cond1
