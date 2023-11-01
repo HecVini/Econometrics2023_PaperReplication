@@ -27,7 +27,6 @@ a1loadinitialdata_1ma <- function(WPmetro) {
 
 a2Estimate<-function(YI,VI,PI,Pop, Corr){
   sx<-Pop$I$k1
-  sxt<-Pop$I$k1
   sxx<-Pop$I$k2
   sxxt<-Pop$I$k2
   sxxx<-Pop$I$k3
@@ -264,10 +263,10 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
         upi$eta>0 & upii$eta>0 & upiii$eta>0 & upiii$eta>0 & upiii$eta>0 & sum(p1)>0 & sum(p2)>0 &
         sum(p3)>0 & all(p1 > 0) & all(p2 > 0) & all(p3 > 0)){
       Hinv<-Hinv3x5INorm1(hg,vp2,px$y,pxx$y,pxxx$y,px$yt,pxx$yt,pxxx$yt,upi,upii,upiii,upiv,upv,sx,sxx,sxxx,p1,p2,p3,zeta,VI)
-      for (i in names(Hinv)){
-        assign(i,unlist(Hinv[i]))
+      nomes<-c('Rh','cond1','cond2','Hdcdi','Hdcdii','Hdcdiii','Hdcdiv','Hdcdv','Hx','Hxx','Hxxx','AgHd','Hdtcdi','Hdtcdii','Hdtcdiii','Hdtcdiv','Hdtcdv','Htx','Htxx','Htxxx','AgHdt','Rh2')
+      for (i in 1:length(names(Hinv))){
+        assign(nomes[i],unlist(Hinv[[names(Hinv)[i]]]))
       }
-      AgHdt <- AgHdtcdf
       if(cond1 & cond2){
         eq <- 10*(AgHdt-Rh2)
         eqs <- sum(eq**2)
@@ -886,16 +885,15 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
         sum(p3)>0 & all(p1 > 0) & all(p2 > 0) & all(p3 > 0)){
 
       Hinv<-Hinv3x5INorm1(hg,vp2,px$y,pxx$y,pxxx$y,px$yt,pxx$yt,pxxx$yt,upi,upii,upiii,upiv,upv,sx,sxx,sxxx,p1,p2,p3,zeta,VI)
-      for (i in names(Hinv)){
-        assign(i,unlist(Hinv[i]))
+      nomes<-c('Rh','cond1','cond2','Hdcdi','Hdcdii','Hdcdiii','Hdcdiv','Hdcdv','Hx','Hxx','Hxxx','AgHd','Hdtcdi','Hdtcdii','Hdtcdiii','Hdtcdiv','Hdtcdv','Htx','Htxx','Htxxx','AgHdt','Rh2')
+      for (i in 1:length(names(Hinv))){
+        assign(nomes[i],unlist(Hinv[[names(Hinv)[i]]]))
       }
-      AgHdt <- AgHdtcdf
       Hinvm<-Hinv3x5INorm1m(hg,vp2m,pxm$y,pxxm$y,pxxxm$y,pxm$yt,pxxm$yt,pxxxm$yt,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm,p1,p2,p3,zeta,VIm,vp1m,VI,Rh)
-      for (i in names(Hinvm)){
-        assign(i,unlist(Hinvm[i]))
+      nomes<-c('Rhm','cond1m','cond2m','Hdcdim','Hdcdiim','Hdcdiiim','Hdcdivm','Hdcdvm','Hxm',' Hxxm',' Hxxxm','AgHdm','Hdtcdim','Hdtcdiim','Hdtcdiiim','Hdtcdivm','Hdtcdvm','Htxm',' Htxxm',' Htxxxm','AgHdtm',' Rh2m')
+      for (i in 1:length(names(Hinvm))){
+        assign(nomes[i],unlist(Hinvm[[names(Hinvm)[i]]]))
       }
-      AgHdtm <- AgHdtcdfm
-
       if(cond1 & cond2 & cond1m & cond2m){
 
         eq1m <- 10*(AgHdtm-Rhm)
@@ -1332,13 +1330,25 @@ CalcCV <- function(y,uph,v,vm,hg){
 
   opts<-list(abstol=1e-4,reltol=1e-4,maxit=5000)
 
-  c(utest, htest, vtest)   <- caluy(y,uph,v,hg)
+  test<- caluy(y,uph,v,hg)
+  nomes<-c('utest','htest','vtest')
+  for (i in 1:length(names(test))){
+    assign(nomes[i],unlist(test[[names(test)[i]]]))
+  }
 
-  c(um,hm,vhm)   <- caluy(y,uph,vm,hg)
+  testm<- caluy(y,uph,vm,hg)
+  nomes<-c('um','hm','vhm')
+  for (i in 1:length(names(testm))){
+    assign(nomes[i],unlist(testm[[names(testm)[i]]]))
+  }
 
   CV <- function(yp){
 
-    c(uh,hh,vh)   <- caluy(exp(yp),uph,v,hg)
+    testh<- caluy(exp(yp),uph,v,hg)
+    nomes<-c('uh','hh','vh')
+    for (i in 1:length(names(testh))){
+      assign(nomes[i],unlist(testh[[names(testh)[i]]]))
+    }
 
     if (imag(um)==0 & imag(uh)==0){
       F <- (um-uh)**2
@@ -1362,9 +1372,10 @@ CalcCV <- function(y,uph,v,vm,hg){
   kappa <- uph$kappa
 
   caly<- caluy(yphat,uph,v,hg)
-  uhat<-caly$u
-  hhat<-caly$h
-  vhat<-caly$vh
+  nomes<-c('uhat','hhat','vhat')
+  for (i in 1:length(names(caly))){
+    assign(nomes[i],unlist(caly[[names(caly)[i]]]))
+  }
   utility(yphat,hh,phi,gamma,alpha,eta,kappa,vh)
   return(list('yphat'=yphat, 'cv'=cv,'fval'=fval))
 }
@@ -1415,11 +1426,12 @@ caluy <- function(y,uph,v,hg){
   vh <- v(b)
 
   #What is the utility of this quality at this rent price and this income
-  phi <- uph.phi
-  gamma <- uph.gamma
-  alpha <- uph.alpha
-  eta <- uph.eta
-  kappa <- uph.kappa
+  uph<-list()
+  phi <- uph$phi
+  gamma <- uph$gamma
+  alpha <- uph$alpha
+  eta <- uph$eta
+  kappa <- uph$kappa
 
   u <- utility(y,h,phi,gamma,alpha,eta,kappa,vh);
 
@@ -1517,8 +1529,8 @@ deriv_dy_dh_FOC_linearVh <- function(h,p,alpha,phi,gammap,eta){
 GLN4quantiles <- function(p, mediancdforig, mu, sigma, r, beta) {
 
   # Set the optimization options
-  opts <- list(Algorithm = "interior-point", MaxFunEvals = 2000000000, MaxIter = 2000000000, TolX = 1e-30, TolFun = 1e-20)
-
+  opts<-list(abstol=1e-4,reltol=1e-4,maxit=5000)
+  
   # Define the objective function
   GLN4quant <- function(q, beta) {
     if (-1000 * beta < exp(q)) {
@@ -1535,7 +1547,7 @@ GLN4quantiles <- function(p, mediancdforig, mu, sigma, r, beta) {
   q_hat <- exp(result$par)
   fval <- result$value
 
-  return(list(q_hat, fval))
+  return(list('q_hat'=q_hat,'fval'=fval))
 }
 
 #Função do modelo que determina que aluguéis com base na distribuição GLN4
@@ -1566,10 +1578,10 @@ GLN4u<-function(Y,V,P0,Solver,metro){
   h <- fig_window()
 
   # Plot the data
-  plot(log(Y.Y), GLNy)
+  plot(log(Y$Y), GLNy)
 
   # Add a scatter plot
-  points(log(Y.Y), Y.Ycd, col = "black", pch = 20, cex = 0.8)
+  points(log(Y$Y), Y$Ycd, col = "black", pch = 20, cex = 0.8)
 
   # Add axis labels and a title
   xlabel("log(Y_1)")
@@ -1633,10 +1645,10 @@ GLN4u<-function(Y,V,P0,Solver,metro){
   h <- fig_window()
 
   # Plot the data
-  plot(log(V.V), GLN4v)
+  plot(log(V$V), GLN4v)
 
   # Add a scatter plot
-  points(log(V.V), V.Vcd, col = "black", pch = 20, cex = 0.8)
+  points(log(V$V), V$Vcd, col = "black", pch = 20, cex = 0.8)
 
   # Add axis labels and a title
   xlabel("log(V_1)")
@@ -1669,10 +1681,10 @@ GLN4u<-function(Y,V,P0,Solver,metro){
   h <- fig_window()
 
   # Plot the data
-  plot(log(Y.Yt), GLNyt)
+  plot(log(Y$Yt), GLNyt)
 
   # Add a scatter plot
-  points(log(Y.Yt), Y.Ytcd, col = "black", pch = 20, cex = 0.8)
+  points(log(Y$Yt), Y$Ytcd, col = "black", pch = 20, cex = 0.8)
 
   # Add axis labels and a title
   xlabel("log(Y_2)")
@@ -1710,10 +1722,10 @@ GLN4u<-function(Y,V,P0,Solver,metro){
   h <- fig_window()
 
   # Plot the data
-  plot(log(V.Vt), GLNvt)
+  plot(log(V$Vt), GLNvt)
 
   # Add a scatter plot
-  points(log(V.Vt), V.Vtcd, col = "black", pch = 20, cex = 0.8)
+  points(log(V$Vt), V$Vtcd, col = "black", pch = 20, cex = 0.8)
 
   # Add axis labels and a title
   xlabel("log(V_2)")
@@ -1804,13 +1816,13 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
   
   # Rh from the normalization that sets v(h) = v
   ## Calculate supply and demand in t=1
-  #A FUNÇÃO É CUSPIDA COMO MATRIZ E CHEGA AQUI COMO VETOR. ISSO PRECISA SER CORRIGIDO.
   Rhlinear <-Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)
-  for(i in names(Rhlinear)){
-    assign(i,Rhlinear[[i]])
+  nomes<-c('Rh','Hdcdi','Hdcdii','Hdcdiii','Hdcdiv','Hdcdv','Hx','Hxx','Hxxx','AgHdcdf','cond1')
+  print(names(Rhlinear))
+  for (i in 1:length(names(Rhlinear))){
+    assign(nomes[i],unlist(Rhlinear[[names(Rhlinear)[i]]]))
+    print(unlist(Rhlinear[[names(Rhlinear)[i]]]))
   }
-  cond1 <- cond
-
   if (cond1 ==1){
     ## Check monotonicity
     monov <- monotonic(vp2,direction = 'inc')
@@ -1818,11 +1830,11 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
     if  (monov) {
       ## Demand for period 2
       Rh_3 <-Rh_3x5Ivh(h,pxyt,pxxyt,pxxxyt,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3, vp2)
-      for(i in names(Rh_3)){
-        assign(i,Rh_3[[i]])
+      nomes<-c('Hdtcdi','Hdtcdii','Hdtcdiii','Hdtcdiv','Hdtcdv','Htx', 'Htxx', 'Htxxx','AgHdtcdf','cond2')
+      for (i in 1:length(names(Rh_3))){
+        assign(nomes[i],unlist(Rh_3[[names(Rh_3)[i]]]))
       }
-      cond2 <- cond
-      
+
       if (cond2 ==1){
         ## Supply for period 2
         
@@ -1840,10 +1852,11 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
         #print(Rh)
         #print("AGHD")
         #print(AgHdcdf)
-        Rhsl2P <-RhSl2PeriodsI(h,vp1,vp2,VI,zeta,Rh,lengthper)
-        for(i in names(Rhsl2P)){
-          assign(i,Rhsl2P[[i]])
-        }      
+        Rhsl2P <-RhSl2PeriodsI(h,vp1,vp2,VI,zeta,AgHdcdf,lengthper)
+        nomes<-c('Rh2', 'N2', 'grateh')
+        for (i in 1:length(names(Rhsl2P))){
+          assign(nomes[i],unlist(Rhsl2P[[names(Rhsl2P)[i]]]))
+        }   
       } else {
         Rh2<- vector()
         N2<- vector() 
@@ -1899,8 +1912,12 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
 
   if  (monov1){
     ## Demand for period 1
-    c(Hdcdim,Hdcdiim,Hdcdiiim,Hdcdivm,Hdcdvm,Hxm, Hxxm, Hxxxm,AgHdcdfm,cond1m) <- Rh_3x5Ivh(h,pxym,pxxym,pxxxym,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm, p1, p2, p3, vp1m)
-
+    Rh_3 <- Rh_3x5Ivh(h,pxym,pxxym,pxxxym,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm, p1, p2, p3, vp1m)
+    nomes<-c('Hdcdim','Hdcdiim','Hdcdiiim','Hdcdivm','Hdcdvm','Hxm', 'Hxxm', 'Hxxxm','AgHdcdfm','cond1m')
+    for (i in 1:length(names(Rh_3))){
+      assign(nomes[i],unlist(Rh_3[[names(Rh_3)[i]]]))
+    }
+    
     if (cond1m ==1){
 
       ## Check monotonicity
@@ -1909,18 +1926,24 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
       if  (monov2){
         ## Demand for period 2
 
-        c(Hdtcdim,Hdtcdiim,Hdtcdiiim,Hdtcdivm,Hdtcdvm,Htxm, Htxxm, Htxxxm,AgHdtcdfm,cond2m) <- Rh_3x5Ivh(h,pxytm,pxxytm,pxxxytm,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm,p1, p2, p3, vp2m)
-
+        Rh_3x <- Rh_3x5Ivh(h,pxytm,pxxytm,pxxxytm,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm,p1, p2, p3, vp2m)
+        nomes<-c('Hdtcdim','Hdtcdiim','Hdtcdiiim','Hdtcdivm','Hdtcdvm','Htxm', 'Htxxm', 'Htxxxm','AgHdtcdfm','cond2m')
+        for (i in 1:length(names(Rh_3x))){
+          assign(nomes[i],unlist(Rh_3x[[names(Rh_3x)[i]]]))
+        }
+        
         if (cond2m == 1){
 
           ## Supply for period 1
           ## of periods between observations
           lengthper <- 4
           #Base metro
+          Vbase1<-list()
           Vbase1$k1ypolyf <- VI$uf
           Vbase1$V <- VI$V
 
           #Ref Metro
+          Vref1<-list()
           Vref1$k2ypolyf <- VIm$uf
           Vref1$Vt <- VIm$V
 
@@ -1930,14 +1953,20 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
           vref <- vp2m
           basesupply <- Rh
 
-          c(Rh1m, N1m, gratehm) <- RhSl2PeriodsIm(h,vbase,vref,Vref1,zeta,basesupply,lengthper,Vbase1)
+          Rhsl1 <- RhSl2PeriodsIm(h,vbase,vref,Vref1,zeta,basesupply,lengthper,Vbase1)
+          nomes<-c('Rh1m', 'N1m', 'gratehm')
+          for (i in 1:length(names(Rhsl1))){
+            assign(nomes[i],unlist(Rhsl1[[names(Rhsl1)[i]]]))
+          }
 
           ## Supply for period 2
           #Base metro
+          Vbase2<-list()
           Vbase2$k1ypolyf <- VIm$uf
           Vbase2$V <- VIm$V
 
           #Ref Metro
+          Vref2<-list()
           Vref2$k2ypolyf <- VIm$uft
           Vref2$Vt <- VIm$Vt
 
@@ -1945,7 +1974,12 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
           vref <- vp2m
           basesupply <- Rh1m
 
-          c(Rh2m, N2m, gratehtm) <- RhSl2PeriodsIm(h,vbase,vref,Vref2,zeta,basesupply,lengthper,Vbase2)
+          Rhsl2 <- RhSl2PeriodsIm(h,vbase,vref,Vref2,zeta,basesupply,lengthper,Vbase2)
+          nomes<-c('Rh2m', 'N2m', 'gratehtm')
+          for (i in 1:length(names(Rhsl2))){
+            assign(nomes[i],unlist(Rhsl2[[names(Rhsl2)[i]]]))
+          }
+          
 
         } else {
           Rh1m <- vector()
@@ -2030,7 +2064,9 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
     cond1m <- 0
 
   }
-  return(c(Rh1m,cond1m,cond2m,Hdcdim,Hdcdiim,Hdcdiiim,Hdcdivm,Hdcdvm,Hxm,Hxxm,Hxxxm,AgHdcdfm,Hdtcdim,Hdtcdiim,Hdtcdiiim,Hdtcdivm,Hdtcdvm,Htxm,Htxxm,Htxxxm,AgHdtcdfm,Rh2m))
+  return(list('Rh1m'=Rh1m,'cond1m'=cond1m,'cond2m'=cond2m,'Hdcdim'=Hdcdim,'Hdcdiim'=Hdcdiim,'Hdcdiiim'=Hdcdiiim,'Hdcdivm'=Hdcdivm,'Hdcdvm'=Hdcdvm,
+              'Hxm'=Hxm,'Hxxm'=Hxxm,'Hxxxm'=Hxxxm,'AgHdcdfm'=AgHdcdfm,'Hdtcdim'=Hdtcdim,'Hdtcdiim'=Hdtcdiim,'Hdtcdiiim'=Hdtcdiiim,'Hdtcdivm'=Hdtcdivm,
+              'Hdtcdvm'=Hdtcdvm,'Htxm'=Htxm,'Htxxm'=Htxxm,'Htxxxm'=Htxxxm,'AgHdtcdfm'=AgHdtcdfm,'Rh2m'=Rh2m))
 }
 
 #library pracma e signal
@@ -2233,9 +2269,6 @@ Rh_3x5Ilinearvh <- function(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,si,sii,siii
     cond=0
   }
   Rh <- AgHdcdf
-  #print("Rh")
-  #print(Rh)
-  #print(sum(AgHdcdf[,13]))
   return(list('Rh' = Rh,'Hdcdi' = Hdcdi,'Hdcdii' = Hdcdii, 'Hdcdiii' = Hdcdiii, 'Hdcdiv' = Hdcdiv,
   'Hdcdv' = Hdcdv, 'Hx' = Hx, 'Hxx' = Hxx, 'Hxxx' = Hxxx, 'AgHdcdf' = AgHdcdf, 'cond' = cond))
 }
@@ -2417,10 +2450,6 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
     g1[i] <- G1[i] - G1[i - 1]
   }
   g1e <- 1 - G1[length(G1)]
-  #print(g1e)
-  #print(g1)
-  #print(sum(g1))
-  #print(G1[13])
   # CDF
   # The distribution of houses with quality h is G1 in base period/place; this means that,
   # normalizing the population to be 1 in the 1st period, we have a g1(1) = q1(1)
@@ -2428,29 +2457,19 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
   r1 <- g1
   r1e <- g1e
   R1e <- R1[length(R1)] + r1e
-  #print(r1e)
   N1 <- 1
   q1 <- r1 * N1
   q1e <- r1e * N1
-  #print(q1e)
   q1t <- c(q1, q1e)
   
-  #print(q1)
-  #print(q1e)
-  #print(q1t)
 
   # t=2
   # Calculate approx pdf
   # We have q2 = q1(V2/V1)**(zeta*Pt) houses of quality h1 in the second period.
   vratioV <- (V2 / V1)
   vratioh <- (V2 / V1)**(Pt * zeta)
-  #print("vratioh")
-  #print(vratioh)
-  #print("q1t")
-  #print(q1t)
   q2 <- q1 * (vratioh[1:(length(vratioh) - 1)])
   q2e <- q1e * vratioh[length(vratioh)]
-  #erro aqui
   q2t <- q1t * vratioh
   N2 <- sum(q2t)
   r2 <- q2 / N2
@@ -2585,7 +2604,7 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
   meangrateV <- sum(grateV * r2t)
   meangrateh <- sum(gratehm * r2t)
 
-  return(list(R2m = R2m, N2m = N2m, gratehm = gratehm))
+  return(list('R2m' = R2m, 'N2m' = N2m, 'gratehm' = gratehm))
 }
 
 #Calculates if utility of housing component is well defined for the normalization in equation (26)
@@ -2678,6 +2697,7 @@ Ycutoff<-function(h,up,v){
 # Variáveis: y (vetor de rendas), v(vetor de aluguéis) e up (lista nomeada dos valores dos parâmetros da função de utilidade)
 
 Ycutoffinv<-function(y, up, v){
+  opts<-list(abstol=1e-10,reltol=1e-10,maxit=1e9)
   hconsumed<-function(hvar){
     if((Ycutoff(exp(hvar),up,v)>0) & is.numeric(exp(hvar))){
       return (sum((Ycutoff(exp(hvar),up,v)-y[1:length(y)-1])**2))
@@ -2689,165 +2709,154 @@ Ycutoffinv<-function(y, up, v){
 
   hini <-mean(v[1:length(v)/2])
   hinip1<-mean(v[length(v)/2:length(v)])
-  quant<-optim(log(c(hini, hinip1)),hconsumed)$par
-  return(c('h_hat'=exp(quant[1]),'fval'=quant[2]))
+  quant<-optim(log(c(hini, hinip1)),hconsumed,control=opts)
+  return(c('h_hat'=exp(quantpar),'fval'=quant$value))
 }
 
 # This function calculates the correlation between income and rent for each
 # unobserved type, and the corresponding implied correlations for the observed types.
 # Then, it calculates moments based on the difference between the correlations implied by the model and the correlations implied by the data.
 
-Yvcorrelations <- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv, vp1, vp2, Corr){
-
-  # - Given some probabilities mapping observed types to unobserved types,
-  # I can calculate the implied joint probability of each one of the combinations for unobserved type i and observed type
-  # k.
-  ycf <- vector()
-  ytcf <- vector()
+Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv, vp1, vp2, Corr){
+  s<-c(sx,sxx,sxxx)
+  sdiag<-diag(s)
   
-  s <- c(sx, sxx, sxxx)
-  sdiag <- diag(s) 
-
-  Pr <- rbind(p1, p2, p3)
-  L <- t(Pr)
+  Pr<-rbind(p1,p2,p3)
+  L<-t(Pr)
   
-  pr_xi <- L %*% sdiag
-
-  ycfx <- vector()
-  ytcfx <- vector()
-  ycfxx <- vector()
-  ytcfxx <- vector()
-  ycfxxx <- vector()
-  ytcfxxx <- vector()
-  vcfx <- vector()
-  vtcfx <- vector()
-  vcfxx <- vector()
-  vtcfxx <- vector()
-  vcfxxx <- vector()
-  vtcfxxx <- vector()
-  # - These probabilities must add to 1.
-  testprob <- sum(pr_xi)
+  pr_xi<-L%*%sdiag
   
-
-
-  # Draw a renter using the probabilities of that matrix
-  # Calculate the cumulative prob of this joint probability
-  # place in a vector
-  pr_xi_vector <- c(pr_xi[,1], pr_xi[,2], pr_xi[,3])
-  cum_prix_vector <- vector()
-  cum_prix_vector[1] <- pr_xi_vector[1]
-
-  for (i in 2:length(pr_xi_vector)){ #3*5 = 15
-    cum_prix_vector[i] <- cum_prix_vector[i-1] + pr_xi_vector[i]
+  testprob<-sum(sum(pr_xi))
+  
+  pr_xi_vector<-c(pr_xi[,1], pr_xi[,2], pr_xi[,3])
+  cum_prix_vector<-vector()
+  cum_prix_vector[1]<-pr_xi_vector[1]
+  for (i in 2:length(pr_xi_vector)){
+    cum_prix_vector[i]<-cum_prix_vector[i-1] + pr_xi_vector[i]
   }
-
-
-  # Return to a matrix
-  stypes <- length(s)
-  cum_prix <- rbind(cum_prix_vector[1:length(p1)], cum_prix_vector[length(p1)+1:length(p1)*(stypes-1)], cum_prix_vector[length(p1)*(stypes-1)+1:length(p1)*stypes])
-
-
+  
+  stypes<-length(s)
+  cum_prix<-cbind(cum_prix_vector[1:length(p1)], cum_prix_vector[(length(p1)+1):(length(p1)*(stypes-1))], cum_prix_vector[(length(p1)*(stypes-1)+1):(length(p1)*stypes)])
+  
   numdraw_x <- 0
   numdraw_xx <- 0
   numdraw_xxx <- 0
   
-  #Draw numbers until there are r observations for each observed type
-  r <- 10000
-  counter <- 1
-  count <- matrix(0, nrow = r, ncol = 2)
+  #Funções para encontrar mínimo em cada coluna de matriz e seus índices
+  min_value<-function(A){
+    if (is.vector(A)){
+      return(min(A))
+    }
+    mv<-c()
+    for (i in 1:ncol(A)){
+      mv<-c(mv,min(A[,i]))
+    }
+    return(mv)
+  }
+  min_index<-function(A){
+    mv<-min_value(A)
+    if (is.vector(A)){
+      return(match(mv,A))
+    }
+    mi<-c()
+    for (i in 1:ncol(A)){
+      mi<-c(mi,match(mv[i],A[,i]))
+    }
+    return(mi)
+  }
   
-  while (min(c(numdraw_x, numdraw_xx, numdraw_xxx)<r)){
-    # random number
-    draw <- runif(1)
-
-    # Locate in the matrix cum_prix
+  r<-10000
+  counter<-1
+  while(min(c(numdraw_x, numdraw_xx, numdraw_xxx))<r){
+    draw<-runif(1)
     
-    locate <- (draw - cum_prix)**2
+    locate<-(draw-cum_prix)**2
+    a<-min_value(locate)
+    b<-min_index(locate)
+    c<-min_value(a)
+    xdraw<-min_index(a)
+    idraw<-b[xdraw]
+    counter<-counter+1
     
-    a <- apply(locate, 2, min)
-    b <- which.min(locate)
-    xdraw <- which.min(a)
-    idraw <- b[xdraw]
-    
-
-    count[counter,] < -c(xdraw, idraw)
-    counter <- counter + 1
-
-    # Count how many draws we have for observed type
-    if (xdraw==1){
-      numdraw_x <-numdraw_x+1
-    }else if (xdraw==2){
-      numdraw_xx <-numdraw_xx+1
-    }else if (xdraw==3){
-      numdraw_xxx <-numdraw_xxx+1
+    if(xdraw==1){
+      numdraw_x<-numdraw_x+1
+    } else if(xdraw==2){
+      numdraw_xx<-numdraw_xx+1
+    } else if(xdraw==3){
+      numdraw_xxx<-numdraw_xxx+1
     }
-
-    # For each quality in the grid and current corresponding price, find the
-    # corresponding income
-
-    if (idraw == 1){
-      ycf <-Ycutoff(h,upi,vp1)
-      ytcf <-Ycutoff(h,upi,vp2)
-
-    }else if (idraw == 2){
-      ycf <-Ycutoff(h,upii,vp1)
-      ytcf <-Ycutoff(h,upii,vp2)
-    }else if (idraw == 3){
-      ycf <-Ycutoff(h,upiii,vp1)
-      ytcf <-Ycutoff(h,upiii,vp2)
-    }else if (idraw == 4){
-      ycf <-Ycutoff(h,upiv,vp1)
-      ytcf <-Ycutoff(h,upiv,vp2)
-    }else if (idraw == 5){
-      ycf <-Ycutoff(h,upv,vp1)
-      ytcf <-Ycutoff(h,upv,vp2)
+    
+    if(idraw==1){
+      ycf <- Ycutoff(h,upi,vp1)
+      ytcf <- Ycutoff(h,upi,vp2)
+    } else if (idraw==2){
+      ycf <- Ycutoff(h,upii,vp1)
+      ytcf <- Ycutoff(h,upii,vp2)
+    } else if (idraw==3){
+      ycf <- Ycutoff(h,upiii,vp1)
+      ytcf <- Ycutoff(h,upii,vp2)
+    } else if (idraw==4){
+      ycf <- Ycutoff(h,upiv,vp1)
+      ytcf <- Ycutoff(h,upii,vp2)
+    } else if (idraw==5){
+      ycf <- Ycutoff(h,upv,vp1)
+      ytcf <- Ycutoff(h,upii,vp2)
     }
-
-    #Assign it to the observed type according to the draw with did in the
-    #cum_prix matrix
-    htrim <- (length(h)-1)
-    if (xdraw==1){
-      ycfx[((numdraw_x-1)*htrim)+1:htrim*numdraw_x] <-ycf
-      ytcfx[((numdraw_x-1)*htrim)+1:htrim*numdraw_x] <-ytcf
-      vcfx[((numdraw_x-1)*htrim)+1:htrim*numdraw_x] <-vp1[1:htrim]
-      vtcfx[((numdraw_x-1)*htrim)+1:htrim*numdraw_x] <-vp2[1:htrim]
-    } else if (xdraw==2){
-      ycfxx[((numdraw_xx-1)*htrim)+1:htrim*numdraw_xx] <-ycf
-      ytcfxx[((numdraw_xx-1)*htrim)+1:htrim*numdraw_xx] <-ytcf
-      vcfxx[((numdraw_xx-1)*htrim)+1:htrim*numdraw_xx] <-vp1[1:htrim]
-      vtcfxx[((numdraw_xx-1)*htrim)+1:htrim*numdraw_xx] <-vp2[1:htrim]
-    } else if (xdraw==3){
-      ycfxxx[((numdraw_xxx-1)*htrim)+1:htrim*numdraw_xxx] <-ycf
-      ytcfxxx[((numdraw_xxx-1)*htrim)+1:htrim*numdraw_xxx] <-ytcf
-      vcfxxx[((numdraw_xxx-1)*htrim)+1:htrim*numdraw_xxx] <-vp1[1:htrim]
-      vtcfxxx[((numdraw_xxx-1)*htrim)+1:htrim*numdraw_xxx] <-vp2[1:htrim]
+    
+    htrim<-length(h)-1
+    ycfx<-vector()
+    ytcfx<-vector()
+    vcfx<-vector()
+    vtcfx<-vector()
+    ycfxx<-vector()
+    ytcfxx<-vector()
+    vcfxx<-vector()
+    vtcfxx<-vector()
+    ycfxxx<-vector()
+    ytcfxxx<-vector()
+    vcfxxx<-vector()
+    vtcfxxx<-vector()
+    
+    if(xdraw==1){
+      ycfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- ycf
+      ytcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- ytcf
+      vcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- vp1[1:htrim]
+      vtcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- vp2[1:htrim]
+    }
+    else if(xdraw==2){
+      ycfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- ycf
+      ytcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- ytcf
+      vcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- vp1[1:htrim]
+      vtcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- vp2[1:htrim]
+    }
+    else if(xdraw==3){
+      ycfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- ycf
+      ytcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- ytcf
+      vcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- vp1[1:htrim]
+      vtcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- vp2[1:htrim]
     }
   }
-
-  #Calculate correlations for each observed type
-
-  corryv_x <-cor(ycfx,vcfx)
-  corrtyv_x <-cor(ytcfx,vtcfx)
-
-  corryv_xx <-cor(ycfxx,vcfxx)
-  corrtyv_xx <-cor(ytcfxx,vtcfxx)
-
-  corryv_xxx <-cor(ycfxxx,vcfxxx)
-  corrtyv_xxx <-cor(ytcfxxx,vtcfxxx)
-
-
-  difx <- (corryv_x - Corr$corr_x1)**2
-  diftx <- (corrtyv_x - Corr$corrt_x1)**2
-
-  difxx <- (corryv_xx - Corr$corr_x2)**2
-  diftxx <- (corrtyv_xx - Corr$corrt_x2)**2
-
-  difxxx <- (corryv_xxx - Corr$corr_x3)**2
-  diftxxx <- (corrtyv_xxx - Corr$corrt_x3)**2
-
-  M <-100* sum(c(difx, diftx, difxx, diftxx, difxxx, diftxxx))
-  return(M)
+  
+  
+  
+  corryv_x <- cor(ycfx,vcfx)
+  corrtyv_x <- cor(ytcfx,vtcfx)
+  
+  corryv_xx <- cor(ycfxx,vcfxx)
+  corrtyv_xx <- cor(ytcfxx,vtcfxx)
+  
+  corryv_xxx <- cor(ycfxxx,vcfxxx)
+  corrtyv_xxx <- cor(ytcfxxx,vtcfxxx)
+  
+  
+  difx<- (corryv_x[1,1] - Corr[['corr_x1']])**2
+  diftx<- (corrtyv_x[1,1] - Corr[['corrt_x1']])**2
+  
+  difxx<- (corryv_xx[1,1] - Corr[['corr_x2']])**2
+  diftxx<- (corrtyv_xx[1,1] - Corr[['corrt_x2']])**2
+  
+  difxxx<- (corryv_xxx[1,1] - Corr[['corr_x3']])**2
+  diftxxx<- (corrtyv_xxx[1,1] - Corr[['corrt_x3']])**2
+  
+  return(100* sum(c(difx, diftx, difxx, diftxx, difxxx, diftxxx)))
 }
-
-
-
