@@ -3,11 +3,13 @@
 #install.packages("pracma")
 #install.packages("signal")
 #install.packages("MonoInc")
+#install.packages('Rfast')
 library(dplyr)
 library(neldermead)
 library(pracma)
 library(signal)
 library(MonoInc)
+library(Rfast)
 
 
 
@@ -304,12 +306,6 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
         verr2xxxup <- sum(dif2xxx[8:length(dif2xxx)]**2)
 
         CorrMoment <- Yvcorrelations(sx, sxx, sxxx, p1, p2, p3, hg, upi,upii,upiii,upiv,upv, vp1, vp2, Corr)
-        ak<-list(eqslow,eqsup,verr1xlow,verr1xup,verr1xxlow,verr1xxup,verr1xxxlow,verr1xxxup,verr2xlow,verr2xup,verr2xxlow,verr2xxup,verr2xxxlow,verr2xxxup, CorrMoment)
-        names(ak)<-c('eqslow','eqsup','verr1xlow','verr1xup','verr1xxlow','verr1xxup','verr1xxxlow','verr1xxxup','verr2xlow','verr2xup','verr2xxlow','verr2xxup','verr2xxxlow','verr2xxxup',' CorrMoment')
-        for(i in names(ak)){
-          print(i)
-          print(ak[[i]])
-        }
         F <- 10*((eqslow + eqsup) + (verr1xlow + verr1xup +verr1xxlow + verr1xxup+verr1xxxlow + verr1xxxup +
                                        verr2xlow + verr2xup +verr2xxlow + verr2xxup +verr2xxxlow + verr2xxxup+CorrMoment))
       }else{
@@ -320,12 +316,10 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
     return(F)
   }
 
-  opts<-list(abstol=1e-4,reltol=1e-4,maxit=5000)
+  opts<-list(abstol=1e-4,reltol=1e-4,maxit=1)
 
-  iter <-50
+  iter <-5
   for (i in 1:iter){
-    k<-c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0)
-    Q(k)
     hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
     phat<-hat$par
     Ehat<-hat$value
@@ -336,6 +330,8 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
     u05 <- c(phat[21], phat[22], phat[23], phat[24], phat[25])
     v02 <- phat[26:39]
 
+    pr0_nolog<-matrix(nrow = 3, ncol=5)
+    
     pr0[1,1:4] <- phat[40:43]
     pr0_nolog[1,1:4] <- exp(phat[40:43])
     pr0_nolog[1,5] <- 1 - sum(pr0_nolog[1,1:4])
@@ -358,12 +354,18 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
     sum(exp(t(pr0)))
 
     iter <-1+iter
+    print(iter)
   }
 
   hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
   phat<-hat$par
   Ehat<-hat$value
-
+  
+  upih<-list()
+  upiih<-list()
+  upiiih<-list()
+  upivh<-list()
+  upvh<-list()
   upih$alpha <- phat[1]
   upih$phi <- phat[2]*100
   upih$eta <- phat[3]*1000
@@ -392,7 +394,9 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
 
   v1h <-hg
   v2h <- exp(phat[26:39])
-
+  
+  prh<-matrix(nrow = 3, ncol=5)
+  
   prh[1,1:4] <- exp(phat[40:43])
   prh[1,5] <- 1-sum(prh[1,1:4])
 
@@ -439,46 +443,48 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   uminiii_mo <- log(1-upiiih$phi*((min(hg)+upiiih$eta)**upiiih$gamma))
   uminiv_mo <- log(1-upivh$phi*((min(hg)+upivh$eta)**upivh$gamma))
   uminv_mo <- log(1-upvh$phi*((min(hg)+upvh$eta)**upvh$gamma))
-
+  
+  
+  
   yih <- Ycutoff(hg,upih,v1h)
-  yimidbin[1] <- (0+yih[1])/2
+  yimidbin <- (0+yih[1])/2
   yimidbin[2:length(yih)] <- (yih[1:length(yih)-1]+yih[2:length(yih)])/2
 
   yiih <- Ycutoff(hg,upiih,v1h)
-  yiimidbin[1] <- (0+yiih[1])/2
+  yiimidbin <- (0+yiih[1])/2
   yiimidbin[2:length(yiih)] <- (yiih[1:length(yiih)-1]+yiih[2:length(yiih)])/2
 
   yiiih <- Ycutoff(hg,upiiih,v1h)
-  yiiimidbin[1] <- (0+yiiih[1])/2
+  yiiimidbin <- (0+yiiih[1])/2
   yiiimidbin[2:length(yiiih)] <- (yiiih[1:length(yiiih)-1]+yiiih[2:length(yiiih)])/2
 
   yivh <- Ycutoff(hg,upivh,v1h)
-  yivmidbin[1] <- (0+yivh[1])/2
+  yivmidbin <- (0+yivh[1])/2
   yivmidbin[2:length(yivh)] <- (yivh[1:length(yivh)-1]+yivh[2:length(yivh)])/2
 
   yvh <- Ycutoff(hg,upvh,v1h)
-  yvmidbin[1] <- (0+yvh[1])/2
+  yvmidbin <- (0+yvh[1])/2
   yvmidbin[2:length(yvh)] <- (yvh[1:length(yvh)-1]+yvh[2:length(yvh)])/2
 
 
   ytih <- Ycutoff(hg,upih,v2h)
-  ytimidbin[1] <- (0+ytih[1])/2
+  ytimidbin <- (0+ytih[1])/2
   ytimidbin[2:length(ytih)] <- (ytih[1:length(ytih)-1]+ytih[2:length(ytih)])/2
 
   ytiih <- Ycutoff(hg,upiih,v2h)
-  ytiimidbin[1] <- (0+ytiih[1])/2
+  ytiimidbin <- (0+ytiih[1])/2
   ytiimidbin[2:length(ytiih)] <- (ytiih[1:length(ytiih)-1]+ytiih[2:length(ytiih)])/2
 
   ytiiih <- Ycutoff(hg,upiiih,v2h)
-  ytiiimidbin[1] <- (0+ytiiih[1])/2
+  ytiiimidbin <- (0+ytiiih[1])/2
   ytiiimidbin[2:length(ytiiih)] <- (ytiiih[1:length(ytiiih)-1]+ytiiih[2:length(ytiiih)])/2
 
   ytivh <- Ycutoff(hg,upivh,v2h)
-  ytivmidbin[1] <- (0+ytivh[1])/2
+  ytivmidbin <- (0+ytivh[1])/2
   ytivmidbin[2:length(ytivh)] <- (ytivh[1:length(ytivh)-1]+ytivh[2:length(ytivh)])/2
 
   ytvh <- Ycutoff(hg,upvh,v2h)
-  ytvmidbin[1] <- (0+ytvh[1])/2
+  ytvmidbin <- (0+ytvh[1])/2
   ytvmidbin[2:length(ytvh)] <- (ytvh[1:length(ytvh)-1]+ytvh[2:length(ytvh)])/2
 
 
@@ -499,7 +505,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   ehy1iii <- IncomeLinearVElast(hg,upiiih)
   ehy1iv <- IncomeLinearVElast(hg,upivh)
   ehy1v <- IncomeLinearVElast(hg,upvh)
-
+  
   ehy2i <- IncomeElast(hg,v2h, upih)
   ehy2ii <- IncomeElast(hg,v2h,upiih)
   ehy2iii <- IncomeElast(hg,v2h,upiiih)
@@ -541,7 +547,8 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
   PIh$elast$ehp1iii <- ehp1iii
   PIh$elast$ehp1iv <- ehp1iv
   PIh$elast$ehp1v <- ehp1v
-
+  
+  print(PIh)
   return(list('PIh'=PIh,'Ehat'=Ehat))
 }
 
@@ -747,14 +754,25 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   tau1xxxm<-pxxxm$v[2]
   m1xxxm<-pxxxm$v[3]
   theta1xxxm<-pxxxm$v[4]
-  G1xxxobm <- cdfGLN4(VIm$V[begy:length(VIm$V)-inicut],exp(omega1xxxm),omega1xxxm,tau1xxxm,m1xxxm,theta1xxxm)
+  G1xxxobm <- cdfGLN4(VI$V[begy:length(VIm$V)-inicut],exp(omega1xxx),omega1xxx,tau1xxx,m1xxx,theta1xxx)
 
+  omega1xxxm<-pxxxm$vt[1]
+  tau2xxxm<-pxxxm$vt[2]
+  m1xxxm<-pxxxm$vt[3]
+  theta1xxxm<-pxxxm$vt[4]
+  G1xxxobm <- cdfGLN4(VIm$V[begy:length(VIm$Vt)-inicut],exp(omega1xxxm),omega1xxxm,tau1xxxm,m1xxxm,theta1xxxm)
+  
+  omega2xxx<-pxxxm$v[1]
+  tau2xxxm<-pxxxm$v[2]
+  m2xxxm<-pxxxm$v[3]
+  theta2xxxm<-pxxxm$v[4]
+  G2xxxobm <- cdfGLN4(VI$Vt[begy:length(VIm$V)-inicut],exp(omega2xxx),omega2xxx,tau2xxx,m2xxx,theta2xxx)
+  
   omega2xxxm<-pxxxm$vt[1]
   tau2xxxm<-pxxxm$vt[2]
   m2xxxm<-pxxxm$vt[3]
   theta2xxxm<-pxxxm$vt[4]
   G2xxxobm <- cdfGLN4(VIm$Vt[begy:length(VIm$Vt)-inicut],exp(omega2xxxm),omega2xxxm,tau2xxxm,m2xxxm,theta2xxxm)
-
 
   pr<-matrix(nrow=3,ncol=5)
   pr[1,1:4] <- c(0.4, 0.05, 0.03, 0.3)
@@ -824,6 +842,13 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   zeta0 <- log(0.065)
 
   Q<-function(p_hat){
+    upi<-list()
+    upii<-list()
+    upiii<-list()
+    upiv<-list()
+    upv<-list()
+    
+    
     upi$alpha <- p_hat[1]
     upi$phi <- p_hat[2]*100
     upi$eta <- p_hat[3]*1000
@@ -878,7 +903,7 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
     cons5 <- utilconpositive(upv,hg)
 
 
-    if (cons1>0 & cons2>0 & cons3>0 & cons4>0 & cons5>0 & upi$alpha>0 & upii$alpha>0 &
+    if (all(cons1>0) & all(cons2>0) & all(cons3>0) & all(cons4>0) & all(cons5>0) & upi$alpha>0 & upii$alpha>0 &
         upiii$alpha>0  & upiv$alpha>0 & upv$alpha>0 & upi$gamma<0 & upii$gamma<0 & upiii$gamma<0 &
         upiv$gamma<0 & upv$gamma<0 & upi$phi>0 & upii$phi>0 & upiii$phi>0 & upiv$phi>0 & upv$phi>0 &
         upi$eta>0 & upii$eta>0 & upiii$eta>0 & upiii$eta>0 & upiii$eta>0 & sum(p1)>0 & sum(p2)>0 &
@@ -890,7 +915,7 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
         assign(nomes[i],unlist(Hinv[[names(Hinv)[i]]]))
       }
       Hinvm<-Hinv3x5INorm1m(hg,vp2m,pxm$y,pxxm$y,pxxxm$y,pxm$yt,pxxm$yt,pxxxm$yt,upi,upii,upiii,upiv,upv,sxm,sxxm,sxxxm,p1,p2,p3,zeta,VIm,vp1m,VI,Rh)
-      nomes<-c('Rhm','cond1m','cond2m','Hdcdim','Hdcdiim','Hdcdiiim','Hdcdivm','Hdcdvm','Hxm',' Hxxm',' Hxxxm','AgHdm','Hdtcdim','Hdtcdiim','Hdtcdiiim','Hdtcdivm','Hdtcdvm','Htxm',' Htxxm',' Htxxxm','AgHdtm',' Rh2m')
+      nomes<-c('Rhm','cond1m','cond2m','Hdcdim','Hdcdiim','Hdcdiiim','Hdcdivm','Hdcdvm','Hxm','Hxxm','Hxxxm','AgHdm','Hdtcdim','Hdtcdiim','Hdtcdiiim','Hdtcdivm','Hdtcdvm','Htxm','Htxxm','Htxxxm','AgHdtm','Rh2m')
       for (i in 1:length(names(Hinvm))){
         assign(nomes[i],unlist(Hinvm[[names(Hinvm)[i]]]))
       }
@@ -983,9 +1008,9 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
       }
   }
 
-  opts<-list(abstol=1e-4,reltol=1e-4,maxit=5000)
+  opts<-list(abstol=1e-4,reltol=1e-4,maxit=5)
 
-  iter <-30
+  iter <-3
   for (i in 1:iter){
     hat <- optim(c(u01, u02, u03, u04, u05, v02,v01m,v02m, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
     phat<-hat$par
@@ -998,7 +1023,8 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
     v02 <- phat[26:39]
     v01m <- phat[40:53]
     v02m <- phat[54:67]
-
+    
+    pr0_nolog<-matrix(nrow=3,ncol=5)
     pr0[1,1:4] <- phat[68:71]
     pr0_nolog[1,1:4] <- exp(phat[68:71])
     pr0_nolog[1,5] <- 1 - sum(pr0_nolog[1,1:4])
@@ -1025,7 +1051,13 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:length(pr0[1,])-1], pr0[2,1:length(pr0[2,])-1], pr0[3,1:length(pr0[3,])-1], zeta0), Q,control=opts)
   phat<-hat$par
   Ehat<-hat$value
-
+  
+  upih<-list()
+  upiih<-list()
+  upiiih<-list()
+  upivh<-list()
+  upvh<-list()
+  
   upih$alpha <- phat[1]
   upih$phi <- phat[2]*100
   upih$eta <- phat[3]*1000
@@ -1056,7 +1088,8 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   v2h <- exp(phat[26:39])
   v1hm <- exp(phat[40:53])
   v2hm <- exp(phat[54:67])
-
+  
+  prh<-matrix(nrow=3,ncol=5)
   prh[1,1:4] <- exp(phat[68:71])
   prh[1,5] <- 1-sum(prh[1,1:4])
 
@@ -1105,44 +1138,44 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   uminv_mo <- log(1-upvh$phi*((min(hg)+upvh$eta)**upvh$gamma))
 
   yih <- Ycutoff(hg,upih,v1h)
-  yimidbin[1] <- (0+yih[1])/2
+  yimidbin <- (0+yih[1])/2
   yimidbin[2:length(yih)] <- (yih[1:length(yih)-1]+yih[2:length(yih)])/2
 
   yiih <- Ycutoff(hg,upiih,v1h)
-  yiimidbin[1] <- (0+yiih[1])/2
+  yiimidbin <- (0+yiih[1])/2
   yiimidbin[2:length(yiih)] <- (yiih[1:length(yiih)-1]+yiih[2:length(yiih)])/2
 
   yiiih <- Ycutoff(hg,upiiih,v1h)
-  yiiimidbin[1] <- (0+yiiih[1])/2
+  yiiimidbin <- (0+yiiih[1])/2
   yiiimidbin[2:length(yiiih)] <- (yiiih[1:length(yiiih)-1]+yiiih[2:length(yiiih)])/2
 
   yivh <- Ycutoff(hg,upivh,v1h)
-  yivmidbin[1] <- (0+yivh[1])/2
+  yivmidbin <- (0+yivh[1])/2
   yivmidbin[2:length(yivh)] <- (yivh[1:length(yivh)-1]+yivh[2:length(yivh)])/2
 
   yvh <- Ycutoff(hg,upvh,v1h)
-  yvmidbin[1] <- (0+yvh[1])/2
+  yvmidbin <- (0+yvh[1])/2
   yvmidbin[2:length(yvh)] <- (yvh[1:length(yvh)-1]+yvh[2:length(yvh)])/2
 
 
   ytih <- Ycutoff(hg,upih,v2h)
-  ytimidbin[1] <- (0+ytih[1])/2
+  ytimidbin <- (0+ytih[1])/2
   ytimidbin[2:length(ytih)] <- (ytih[1:length(ytih)-1]+ytih[2:length(ytih)])/2
 
   ytiih <- Ycutoff(hg,upiih,v2h)
-  ytiimidbin[1] <- (0+ytiih[1])/2
+  ytiimidbin <- (0+ytiih[1])/2
   ytiimidbin[2:length(ytiih)] <- (ytiih[1:length(ytiih)-1]+ytiih[2:length(ytiih)])/2
 
   ytiiih <- Ycutoff(hg,upiiih,v2h)
-  ytiiimidbin[1] <- (0+ytiiih[1])/2
+  ytiiimidbin <- (0+ytiiih[1])/2
   ytiiimidbin[2:length(ytiiih)] <- (ytiiih[1:length(ytiiih)-1]+ytiiih[2:length(ytiiih)])/2
 
   ytivh <- Ycutoff(hg,upivh,v2h)
-  ytivmidbin[1] <- (0+ytivh[1])/2
+  ytivmidbin <- (0+ytivh[1])/2
   ytivmidbin[2:length(ytivh)] <- (ytivh[1:length(ytivh)-1]+ytivh[2:length(ytivh)])/2
 
   ytvh <- Ycutoff(hg,upvh,v2h)
-  ytvmidbin[1] <- (0+ytvh[1])/2
+  ytvmidbin <- (0+ytvh[1])/2
   ytvmidbin[2:length(ytvh)] <- (ytvh[1:length(ytvh)-1]+ytvh[2:length(ytvh)])/2
 
 
@@ -1242,9 +1275,9 @@ a3Estimate<-function(YI,VI,PI,Pop,YIm,VIm,PIm,Popm, Corr){
   ehy2ivm <- IncomeElast(hg,v2hm,upivh)
   ehy2vm <- IncomeElast(hg,v2hm,upvh)
 
-  ycv<-vector()
-  CV<-vector()
-  fvalCV<-vector()
+  ycv<-c()
+  CV<-c()
+  fvalCV<-c()
   for (i in 1:length(Ycut)){
     CVi<-CalcCV(Ycut[i],upih,v2h,v2hm, hg)
     ycv<-append(ycv,CVi$yphat)
@@ -1499,7 +1532,7 @@ deriv_dy_dh_FOC <- function(h,alpha,phi,gammap,eta,vp,vpp){
   Tp <- vpp*(1-phi*(heta**gammap)) + vp*(-phi*gammap*(heta**(gammap-1)))
   B <- -phi*gammap*alpha*(heta**(gammap-1))
   Bp <- -phi*gammap*alpha*(gammap-1)*(heta**(gammap-2))
-  Dydh <- ((TTp*B - Bp*T)/(B**2)) + vp
+  Dydh <- ((Tp*B - Bp*T)/(B**2)) + vp
 
   return(Dydh)
 }
@@ -1801,27 +1834,25 @@ hd <-function(pxy,pxxy,pxxxy,si,sii,siii,pi,ycf){
 #model or for the base metro area in the multiple metro areas model
 Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,upiii,upiv,upv,sx,sxx,sxxx,p1,p2,p3,zeta,VI){
   
-  Hdtcdi = vector()
-  Hdtcdii = vector() 
-  Hdtcdiii = vector() 
-  Hdtcdiv = vector() 
-  Hdtcdv = vector()
-  Htx  = vector() 
-  Htxx = vector() 
-  Htxxx = vector()
-  AgHdtcdf = vector() 
-  Rh2= vector() 
-  #N2 = vector() 
-  #grateh = vector()  
+  Hdtcdi = c()
+  Hdtcdii = c() 
+  Hdtcdiii = c() 
+  Hdtcdiv = c() 
+  Hdtcdv = c()
+  Htx  = c() 
+  Htxx = c() 
+  Htxxx = c()
+  AgHdtcdf = c() 
+  Rh2= c() 
+  #N2 = c() 
+  #grateh = c()  
   
   # Rh from the normalization that sets v(h) = v
   ## Calculate supply and demand in t=1
   Rhlinear <-Rh_3x5Ilinearvh(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,sx,sxx,sxxx, p1, p2, p3)
   nomes<-c('Rh','Hdcdi','Hdcdii','Hdcdiii','Hdcdiv','Hdcdv','Hx','Hxx','Hxxx','AgHdcdf','cond1')
-  print(names(Rhlinear))
   for (i in 1:length(names(Rhlinear))){
     assign(nomes[i],unlist(Rhlinear[[names(Rhlinear)[i]]]))
-    print(unlist(Rhlinear[[names(Rhlinear)[i]]]))
   }
   if (cond1 ==1){
     ## Check monotonicity
@@ -1848,51 +1879,47 @@ Hinv3x5INorm1 <- function(h,vp2,pxy,pxxy,pxxxy, pxyt, pxxyt, pxxxyt, upi,upii,up
         #Joao
         #aqui entrava t(h) e o resultado era esquisito (um vetor saía transposto) em RhSl2PeriodsI
         vp1 <- t(h)
-        #print("RH")
-        #print(Rh)
-        #print("AGHD")
-        #print(AgHdcdf)
         Rhsl2P <-RhSl2PeriodsI(h,vp1,vp2,VI,zeta,AgHdcdf,lengthper)
         nomes<-c('Rh2', 'N2', 'grateh')
         for (i in 1:length(names(Rhsl2P))){
           assign(nomes[i],unlist(Rhsl2P[[names(Rhsl2P)[i]]]))
         }   
       } else {
-        Rh2<- vector()
-        N2<- vector() 
-        grateh<- vector()  
+        Rh2<- c()
+        N2<- c() 
+        grateh<- c()  
       }      
     } else { 
       
-      Hdtcdi = vector()
-      Hdtcdii = vector() 
-      Hdtcdiii = vector() 
-      Hdtcdiv = vector() 
-      Hdtcdv = vector()
-      Htx  = vector() 
-      Htxx = vector() 
-      Htxxx = vector()
-      AgHdtcdf = vector() 
-      Rh2= vector() 
-      N2 = vector() 
-      grateh = vector()  
+      Hdtcdi = c()
+      Hdtcdii = c() 
+      Hdtcdiii = c() 
+      Hdtcdiv = c() 
+      Hdtcdv = c()
+      Htx  = c() 
+      Htxx = c() 
+      Htxxx = c()
+      AgHdtcdf = c() 
+      Rh2= c() 
+      N2 = c() 
+      grateh = c()  
       cond2=0
     }
     
   } else {
     
-    Hdtcdi = vector()
-    Hdtcdii = vector() 
-    Hdtcdiii = vector() 
-    Hdtcdiv = vector() 
-    Hdtcdv = vector()
-    Htx  = vector() 
-    Htxx = vector() 
-    Htxxx = vector()
-    AgHdtcdf = vector() 
-    Rh2= vector() 
-    N2 = vector() 
-    grateh = vector()  
+    Hdtcdi = c()
+    Hdtcdii = c() 
+    Hdtcdiii = c() 
+    Hdtcdiv = c() 
+    Hdtcdv = c()
+    Htx  = c() 
+    Htxx = c() 
+    Htxxx = c()
+    AgHdtcdf = c() 
+    Rh2= c() 
+    N2 = c() 
+    grateh = c()  
     cond2=0
   }
   
@@ -1982,84 +2009,84 @@ Hinv3x5INorm1m <- function(h,vp2m, pxym, pxxym, pxxxym, pxytm, pxxytm, pxxxytm, 
           
 
         } else {
-          Rh1m <- vector()
-          N1m <- vector()
-          gratehm <- vector()
-          Rh2m <- vector()
-          N2m <- vector()
-          gratehtm <- vector()
+          Rh1m <- c()
+          N1m <- c()
+          gratehm <- c()
+          Rh2m <- c()
+          N2m <- c()
+          gratehtm <- c()
         }
       } else {
 
-        Hdtcdim <- vector()
-        Hdtcdiim <- vector()
-        Hdtcdiiim <- vector()
-        Hdtcdivm <- vector()
-        Hdtcdvm <- vector()
-        Htxm  <- vector()
-        Htxxm <- vector()
-        Htxxxm <- vector()
-        AgHdtcdfm <- vector()
+        Hdtcdim <- c()
+        Hdtcdiim <- c()
+        Hdtcdiiim <- c()
+        Hdtcdivm <- c()
+        Hdtcdvm <- c()
+        Htxm  <- c()
+        Htxxm <- c()
+        Htxxxm <- c()
+        AgHdtcdfm <- c()
 
-        Rh1m <- vector()
-        N1m <- vector()
-        gratehm <- vector()
-        Rh2m <- vector()
-        N2m <- vector()
-        gratehtm <- vector()
+        Rh1m <- c()
+        N1m <- c()
+        gratehm <- c()
+        Rh2m <- c()
+        N2m <- c()
+        gratehtm <- c()
 
         cond2m <- 0
       }
 
     } else {
 
-      Hdtcdim <- vector()
-      Hdtcdiim <- vector()
-      Hdtcdiiim <- vector()
-      Hdtcdivm <- vector()
-      Hdtcdvm <- vector()
-      Htxm  <- vector()
-      Htxxm <- vector()
-      Htxxxm <- vector()
-      AgHdtcdfm <- vector()
-      Rh1m <- vector()
-      N1m <- vector()
-      gratehm <- vector()
-      Rh2m <- vector()
-      N2m <- vector()
-      gratehtm <- vector()
+      Hdtcdim <- c()
+      Hdtcdiim <- c()
+      Hdtcdiiim <- c()
+      Hdtcdivm <- c()
+      Hdtcdvm <- c()
+      Htxm  <- c()
+      Htxxm <- c()
+      Htxxxm <- c()
+      AgHdtcdfm <- c()
+      Rh1m <- c()
+      N1m <- c()
+      gratehm <- c()
+      Rh2m <- c()
+      N2m <- c()
+      gratehtm <- c()
       cond2m <- 0
     }
 
   } else {
 
-    Hdcdim <- vector()
-    Hdcdiim <- vector()
-    Hdcdiiim <- vector()
-    Hdcdivm <- vector()
-    Hdcdvm <- vector()
-    Hdtcdim <- vector()
-    Hdtcdiim <- vector()
-    Hdtcdiiim <- vector()
-    Hdtcdivm <- vector()
-    Hdtcdvm <- vector()
+    Hdcdim <- c()
+    Hdcdiim <- c()
+    Hdcdiiim <- c()
+    Hdcdivm <- c()
+    Hdcdvm <- c()
+    Hdtcdim <- c()
+    Hdtcdiim <- c()
+    Hdtcdiiim <- c()
+    Hdtcdivm <- c()
+    Hdtcdvm <- c()
 
-    Hxm  <- vector()
-    Hxxm <- vector()
-    Hxxxm <- vector()
-    Htxm  <- vector()
-    Htxxm <- vector()
-    Htxxxm <- vector()
+    Hxm  <- c()
+    Hxxm <- c()
+    Hxxxm <- c()
+    Htxm  <- c()
+    Htxxm <- c()
+    Htxxxm <- c()
 
-    AgHdcdfm <- vector()
-    AgHdtcdfm <- vector()
+    AgHdcdfm <- c()
+    AgHdtcdfm <- c()
 
-    Rh1m <- vector()
-    N1m <- vector()
-    gratehm <- vector()
-    Rh2m <- vector()
-    N2m <- vector()
-    gratehtm <- vector()
+    Rh1m <- c()
+    N1m <- c()
+    gratehm <- c()
+    Rh2m <- c()
+    N2m <- c()
+    gratehtm <- c()
     cond2m <- 0
     cond1m <- 0
 
@@ -2076,9 +2103,8 @@ IncomeElast <- function(h, v, U){
   alpha <- U$alpha
   eta <- U$eta
   kappa  <-  U$kappa
-  library("pracma")
 
-  polytool(h,v,d)
+  #polytool(h,v,d)
   d  <-  2
   p  <-  polyfit(h, v, d) #obtém os coeficientes do polinomio - é polyfit no R tbm
 
@@ -2102,28 +2128,13 @@ IncomeElast <- function(h, v, U){
 
 #library pracma e signal
 IncomeLinearVElast <- function(h,U){
-
-  library("pracma")
-
   phi <- U$phi
   gammap <- U$gamma
   alpha <- U$alpha
   eta <- U$eta
   kappa <- U$kappa
 
-  d  <-  2
-  p  <-  polyfit(h, v, d) #obtém os coeficientes do polinomio - é polyfit no R tbm
-
-  v  <-  polyval(p,h) #calcula o polinomio para todos os valores de h - tbm é polyval
-
-  #v'(h)
-  pd  <-  polyder(p) #obtém os coeficientes da derivada do polinomio - tbm é polyder
-  vp  <-  polyval(pd,h)  #calcula a derivada
-  #v''(h) - mesma coisa para a segunda derivada.
-  pdd  <-  polyder(pd)
-  vpp  <-  polyval(pdd,h)
-
-
+  p<-1
 
   Dy1h  <-  deriv_dy_dh_FOC_linearVh(h,p,alpha,phi,gammap,eta)
   Dhy1  <-  1/Dy1h
@@ -2259,13 +2270,13 @@ Rh_3x5Ilinearvh <- function(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,si,sii,siii
 
     cond=1
   }else{
-    AgHdcdf <- vector()
-    Hdcdi <- vector()
-    Hdcdii <- vector()
-    Hdcdiii <- vector()
-    Hx  <- vector()
-    Hxx <- vector()
-    Hxxx <- vector()
+    AgHdcdf <- c()
+    Hdcdi <- c()
+    Hdcdii <- c()
+    Hdcdiii <- c()
+    Hx  <- c()
+    Hxx <- c()
+    Hxxx <- c()
     cond=0
   }
   Rh <- AgHdcdf
@@ -2324,11 +2335,11 @@ Rh_3x5Ivh <- function(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,si,sii,siii,p1,p2
     hdiv <- hd(pxy,pxxy,pxxxy,si,sii,siii,piv,ycfiv)
     hdv <- hd(pxy,pxxy,pxxxy,si,sii,siii,pv,ycfv)
 
-    Hdcdi <- vector()
-    Hdcdii <- vector()
-    Hdcdiii <- vector()
-    Hdcdiv <- vector()
-    Hdcdv <- vector()
+    Hdcdi <- c()
+    Hdcdii <- c()
+    Hdcdiii <- c()
+    Hdcdiv <- c()
+    Hdcdv <- c()
     
     
     #demand CDFs
@@ -2368,15 +2379,15 @@ Rh_3x5Ivh <- function(h,pxy,pxxy,pxxxy,upi,upii,upiii,upiv,upv,si,sii,siii,p1,p2
 
     cond<-1
   } else {
-    AgHdcdf = vector()
-    Hdcdi =vector()
-    Hdcdii = vector()
-    Hdcdiii = vector()
-    Hdcdiv = vector()
-    Hdcdv = vector()
-    Hx  = vector()
-    Hxx = vector()
-    Hxxx = vector()
+    AgHdcdf = c()
+    Hdcdi =c()
+    Hdcdii = c()
+    Hdcdiii = c()
+    Hdcdiv = c()
+    Hdcdv = c()
+    Hx  = c()
+    Hxx = c()
+    Hxxx = c()
     cond=0
   }
   return(list('Hdcdi' = Hdcdi,'Hdcdii' = Hdcdii,'Hdcdiii' = Hdcdiii, 'Hdcdiv' = Hdcdiv, 'Hdcdv' = Hdcdv,
@@ -2399,10 +2410,10 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
   # In equilibrium for t=1
   R1 <- G1
 
-  V1 <- vector()
-  V2 <- vector()
-  test <- vector()
-  test2 <- vector()
+  V1 <- c()
+  V2 <- c()
+  test <- c()
+  test2 <- c()
 
   # Corresponding values
   for (j in 1:length(h)) {
@@ -2441,10 +2452,8 @@ RhSl2PeriodsI <- function(h, vp1, vp2, V, zeta, G1, Pt) {
   #G1 não está se comportando como uma cdf.
   #O que era uma matriz acaba por virar um vetor
   G1 <- matrix(G1, nrow = 5)
-  #print('G1')
-  #print(G1)
   G1 <- colSums(G1)
-  g1 <- vector()
+  g1 <- c()
   g1[1] <- G1[1]
   for (i in 2:length(G1)) {
     g1[i] <- G1[i] - G1[i - 1]
@@ -2512,11 +2521,10 @@ RhSl2PeriodsIm <- function(h, vp1m, vp2m, Vref, zeta, G1, Pt, Vbase) {
   # Linear pricing function for the first period
   v1 <- vp1m
   v2 <- vp2m
-
-  V1 <- vp1
-  V2 <- vp2
-  test <- vp1
-  test2 <- vp2
+  V1<-c()
+  test<-c()
+  V2<-c()
+  test2<-c()
 
   # Corresponding values
   for (j in 1:length(h)) {
@@ -2718,6 +2726,19 @@ Ycutoffinv<-function(y, up, v){
 # Then, it calculates moments based on the difference between the correlations implied by the model and the correlations implied by the data.
 
 Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv, vp1, vp2, Corr){
+  ycfx<-c()
+  ytcfx<-c()
+  vcfx<-c()
+  vtcfx<-c()
+  ycfxx<-c()
+  ytcfxx<-c()
+  vcfxx<-c()
+  vtcfxx<-c()
+  ycfxxx<-c()
+  ytcfxxx<-c()
+  vcfxxx<-c()
+  vtcfxxx<-c()
+  
   s<-c(sx,sxx,sxxx)
   sdiag<-diag(s)
   
@@ -2729,7 +2750,7 @@ Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv,
   testprob<-sum(sum(pr_xi))
   
   pr_xi_vector<-c(pr_xi[,1], pr_xi[,2], pr_xi[,3])
-  cum_prix_vector<-vector()
+  cum_prix_vector<-c()
   cum_prix_vector[1]<-pr_xi_vector[1]
   for (i in 2:length(pr_xi_vector)){
     cum_prix_vector[i]<-cum_prix_vector[i-1] + pr_xi_vector[i]
@@ -2737,43 +2758,19 @@ Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv,
   
   stypes<-length(s)
   cum_prix<-cbind(cum_prix_vector[1:length(p1)], cum_prix_vector[(length(p1)+1):(length(p1)*(stypes-1))], cum_prix_vector[(length(p1)*(stypes-1)+1):(length(p1)*stypes)])
-  
   numdraw_x <- 0
   numdraw_xx <- 0
   numdraw_xxx <- 0
-  
-  #Funções para encontrar mínimo em cada coluna de matriz e seus índices
-  min_value<-function(A){
-    if (is.vector(A)){
-      return(min(A))
-    }
-    mv<-c()
-    for (i in 1:ncol(A)){
-      mv<-c(mv,min(A[,i]))
-    }
-    return(mv)
-  }
-  min_index<-function(A){
-    mv<-min_value(A)
-    if (is.vector(A)){
-      return(match(mv,A))
-    }
-    mi<-c()
-    for (i in 1:ncol(A)){
-      mi<-c(mi,match(mv[i],A[,i]))
-    }
-    return(mi)
-  }
-  
-  r<-10000
+
+  r<-1000
   counter<-1
   while(min(c(numdraw_x, numdraw_xx, numdraw_xxx))<r){
     draw<-runif(1)
     
     locate<-(draw-cum_prix)**2
-    a<-min_value(locate)
-    b<-min_index(locate)
-    c<-min_value(a)
+    a<-colMins(locate, value=TRUE)
+    b<-colMins(locate)
+    c<-min(a)
     xdraw<-min_index(a)
     idraw<-b[xdraw]
     counter<-counter+1
@@ -2804,41 +2801,27 @@ Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv,
     }
     
     htrim<-length(h)-1
-    ycfx<-vector()
-    ytcfx<-vector()
-    vcfx<-vector()
-    vtcfx<-vector()
-    ycfxx<-vector()
-    ytcfxx<-vector()
-    vcfxx<-vector()
-    vtcfxx<-vector()
-    ycfxxx<-vector()
-    ytcfxxx<-vector()
-    vcfxxx<-vector()
-    vtcfxxx<-vector()
-    
     if(xdraw==1){
-      ycfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- ycf
-      ytcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- ytcf
-      vcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- vp1[1:htrim]
-      vtcfx[(((numdraw_x-1)*htrim)+1):(htrim*numdraw_x)] <- vp2[1:htrim]
+      ycfx<-c(ycfx,ycf)
+      ytcfx<-c(ytcfx,ytcf)
+      vcfx<-c(vcfx,vp1[1:htrim])
+      vtcfx<-c(vtcfx,vp2[1:htrim])
     }
     else if(xdraw==2){
-      ycfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- ycf
-      ytcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- ytcf
-      vcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- vp1[1:htrim]
-      vtcfxx[(((numdraw_xx-1)*htrim)+1):(htrim*numdraw_xx)] <- vp2[1:htrim]
+      ycfxx<-c(ycfxx,ycf)
+      ytcfxx<-c(ytcfxx,ytcf)
+      vcfxx<-c(vcfxx,vp1[1:htrim])
+      vtcfxx<-c(vtcfxx,vp2[1:htrim])
     }
     else if(xdraw==3){
-      ycfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- ycf
-      ytcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- ytcf
-      vcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- vp1[1:htrim]
-      vtcfxxx[(((numdraw_xxx-1)*htrim)+1):(htrim*numdraw_xxx)] <- vp2[1:htrim]
+      ycfxxx<-c(ycfxxx,ycf)
+      ytcfxxx<-c(ytcfxxx,ytcf)
+      vcfxxx<-c(vcfxxx,vp1[1:htrim])
+      vtcfxxx<-c(vtcfxxx,vp2[1:htrim])
     }
   }
   
-  
-  
+
   corryv_x <- cor(ycfx,vcfx)
   corrtyv_x <- cor(ytcfx,vtcfx)
   
@@ -2848,15 +2831,13 @@ Yvcorrelations<- function(sx, sxx, sxxx, p1, p2, p3, h, upi,upii,upiii,upiv,upv,
   corryv_xxx <- cor(ycfxxx,vcfxxx)
   corrtyv_xxx <- cor(ytcfxxx,vtcfxxx)
   
+  difx<- (corryv_x - Corr[['corr_x1']])**2
+  diftx<- (corrtyv_x - Corr[['corrt_x1']])**2
   
-  difx<- (corryv_x[1,1] - Corr[['corr_x1']])**2
-  diftx<- (corrtyv_x[1,1] - Corr[['corrt_x1']])**2
+  difxx<- (corryv_xx - Corr[['corr_x2']])**2
+  diftxx<- (corrtyv_xx - Corr[['corrt_x2']])**2
   
-  difxx<- (corryv_xx[1,1] - Corr[['corr_x2']])**2
-  diftxx<- (corrtyv_xx[1,1] - Corr[['corrt_x2']])**2
-  
-  difxxx<- (corryv_xxx[1,1] - Corr[['corr_x3']])**2
-  diftxxx<- (corrtyv_xxx[1,1] - Corr[['corrt_x3']])**2
-  
+  difxxx<- (corryv_xxx - Corr[['corr_x3']])**2
+  diftxxx<- (corrtyv_xxx - Corr[['corrt_x3']])**2
   return(100* sum(c(difx, diftx, difxx, diftxx, difxxx, diftxxx)))
 }
