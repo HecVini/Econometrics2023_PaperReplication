@@ -324,7 +324,7 @@ a2Estimate<-function(YI,VI,PI,Pop, Corr){
 
   opts<-list(abstol=1e-4,reltol=1e-4,maxit=1)
   
-  iter <-5
+  iter <-50
   for (i in 1:iter){
     hat <- optim(c(u01, u02, u03, u04, u05, v02, pr0[1,1:(length(pr0[1,])-1)], pr0[2,1:(length(pr0[2,])-1)], pr0[3,(1:length(pr0[3,])-1)], zeta0), Q,control=opts)
     phat<-hat$par
