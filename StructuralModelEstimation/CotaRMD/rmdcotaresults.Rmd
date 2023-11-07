@@ -1,0 +1,216 @@
+
+---
+title: "Replication"
+author: "Guilherme Cota"
+date: "2023-10-26"
+output: pdf_document
+---
+
+# 1. Empirical Results
+
+Naturally, with the significant reduction in iterations, we were unable to achieve the desired results. However, we conducted a robustness test by reducing the iterations of the MATLAB code and observed that, in doing so, the results also diverged considerably from those of the article.
+
+## 1.1. The model in Chicago
+
+Here we report the empirical results when we estimate the model using data for Chicago in 1999 and 2003.
+
+* **Estimated Probabilities**
+
+The table below, present in the article, shows the estimated probabilities of each observable type $x$ being of unobservable type $i$:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+| $x_1$ | $0.41$ | $0.07$ | $0.03$ | $0.40$ | $0.09$ |
+| $x_2$ | $0.08$ | $0.50$ | $0.03$ | $0.09$ | $0.30$ |
+| $x_3$ | $0.04$ | $0.17$ | $0.65$ | $0.10$ | $0.04$ |
+
+Our estimation with a random initial guess, as in the paper:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+| $x_1$ | $0.401$ | $0.056$ | $0.049$ | $0.495$ | $0$ |
+| $x_2$ | $0.100$ | $0.641$ | $0.010$ | $0.249$ | $0$ |
+| $x_3$ | $0.052$ | $0.200$ | $0.647$ | $0.100$ | $0$ |
+
+Our estimation with an initial guess matching the results from the paper:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+| $x_1$ |   $0.407$   |  $0.236$  |  $0.050$  |  $0.306$   |$0$|
+| $x_2$ |   $0.104$   |  $0.829$   |  $0.113$  |  $0.056$  |$0$|
+| $x_3$ |   $0.052$   |  $0.207$  |  $0.637$  |  $0.104$   |$0$|
+
+Just like in the article, individuals of observable type $x_i$ are more likely to be of unobservable type $i$.
+
+Note that, by reducing the number of iterations for correlation calculations made these values more pronounced and we are having difficulty identifying individuals of unobservable type 5.
+
+We conducted some tests with more iterations for correlation calculations and managed to better approximate the estimated probabilities. However, in order to achieve this, we had to reduce the iterations in the moment function.
+
+* **Preference Parameter Estimates**
+
+The table below, present in the article, reports preference parameter estimates by article:
+
+|         | $\alpha_i$ | $\phi_i$ |  $\eta_i$  | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:----------:|:----------:|
+| $i = 1$ |  $1.22$  |  $ 9.29$  | $.42 $  |  $-1.77$|
+| $i = 2$ |  $1.61$   |  $4.32$  | $1.19$  |  $-1.22$ |
+| $i = 3$ |  $2.12$   |  $1.15$  | $5.71$  |  $-1.618$|
+| $i = 4$ |  $1.11$   |  $9.11$  | $ .99$  |  $-1.51$ 
+| $i = 5$ |  $1.33$  |  $ 7.77$  | $1.98$ |  $-1.99$ |
+
+Our estimation with a random initial guess, as in the paper:
+
+|         | $\alpha_i$ | $\phi_i$ |  $\eta_i$  | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:----------:|:----------:|
+| $i = 1$ |  $107.94$  |  $0.04$  | $6303.22$  |  $-0.01$|
+| $i = 2$ |  $79.67$   |  $0.05$  | $1874.92$  |  $-0.11$ |
+| $i = 3$ |  $92.98$   |  $0.09$  | $1875.40$  |  $-0.02$|
+| $i = 4$ |  $84.13$   |  $0.04$  | $1874.99$  |  $-0.07$ 
+| $i = 5$ |  $330.21$  |  $0.13$  | $14734.46$ |  $-0.02$ |
+
+Our estimation with an initial guess matching the results from the paper:
+
+|         | $\alpha_i$ | $\phi_i$ | $\eta_i$ | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|
+| $i = 1$ |   $1.88$   |  $15.8$  |  $3055$  |  $-1.74$   |
+| $i = 2$ |   $1.75$   |  $202$   |  $30.2$  |  $-0.877$  |
+| $i = 3$ |   $10.8$   |  $2.83$  |  $9242$  |  $-1.58$   |
+| $i = 4$ |   $3.71$   |  $1.74$  |  $21.8$  |  $-1.12$   |
+| $i = 5$ |   $1.93$   |  $9.82$  |  $1738$  |  $-1.96$   |
+
+As in the article, we find that the unobserved types have different preference parameters and hence different housing demands.
+
+The initial guess matching the results from the paper produces better results for estimation, but even so, we suspect that computational limitations may have affected some results.
+
+* **Estimated Elasticities**
+
+Price and income elasticities implied by the authors preference parameters estimates are reported below:
+
+|$\epsilon_y(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i=1$|$0.39$|$0.39$|$0.39$|
+|$i=2$|$0.54$|$0.52$|$0.52$|
+|$i=3$|$0.73$|$0.60$|$0.55$|
+|$i=4$|$0.47$|$0.45$|$0.45$|
+|$i=5$|$0.44$|$0.40$|$0.39$|
+
+|$\epsilon_v(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i=1$|$-0.38$|$-0.37$|$-0.37$|
+|$i=2$|$-0.54$|$-0.50$|$-0.48$|
+|$i=3$|$-0.74$|$-0.59$|$-0.52$|
+|$i=4$|$-0.46$|$-0.43$|$-0.42$|
+|$i=5$|$-0.44$|$-0.439$|$-0.37$|
+
+Our estimation with a random initial guess, as in the paper:
+
+|$\epsilon_y(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i = 1$|$2.729$|$1.870$|$1.426$|
+|$i = 2$|$1.312$|$1.114$|$1.015$|
+|$i = 3$|$1.424$|$1.204$|$1.094$|
+|$i = 4$|$1.361$|$1.153$|$1.049$|
+|$i = 5$|$24.999$|$12.945$|$6.946$|
+
+|$\epsilon_v(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i=1$|$-2.635$|$-1.813$|$-1.403$|
+|$i=2$|$-1.309$|$-1.113$|$-1.014$|
+|$i=3$|$-1.422$|$-1.203$|$-1.093$|
+|$i=4$|$-1.361$|$-1.153$|$-1.049$|
+|$i=5$|$-3.368$|$-2.177$|$-1.584$|
+
+Our estimation with an initial guess matching the results from the paper:
+
+|$\epsilon_y(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i=1$|$0.664$|$0.514$|$0.439$|
+|$i=2$|$0.564$|$0.547$|$0.54$|
+|$i=3$|$1.351$|$0.868$|$0.628$|
+|$i=4$|$0.495$|$0.48$|$0.475$|
+|$i=5$|$0.496$|$0.417$|$0.378$|
+
+|$\epsilon_v(i)$|$\$ 18,000$   |$\$50,000$   |$\$120,000$   |
+|:---:|:---:|:---:|:---:|
+|$i=1$|$-0.664$|$-0.514$|$-0.439$|
+|$i=2$|$-0.555$|$-0.545$|$-0.539$|
+|$i=3$|$-1.351$|$-0.868$|$-0.628$|
+|$i=4$|$-0.486$|$-0.478$|$-0.474$|
+|$i=5$|$-0.496$|$-0.417$|$-0.378$|
+
+As in the article, we find that income elasticities vary across type, with types 1 and 5 having the lowest income elasticities and type 3 the highest.
+
+Again, initial guesses matching the results from the article produce closer results, indicating that the estimation is correct.
+
+## 1.2. The model in Chicago and New York
+
+Here we report the empirical results when we estimate the model using data for Chicago and New York in 1999 and 2003.
+
+These results are in the Appendix of the article.
+
+
+* **Estimated Probabilities**
+
+The table below, present in the article, shows the estimated probabilities of each observable type $x$ being of unobservable type $i$:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+| $x_1$ | $0.38$ | $0.04$ | $0.05$ | $0.39$ | $0.14$ |
+| $x_2$ | $0.05$ | $0.63$ | $0.04$ | $0.12$ | $0.16$ |
+| $x_3$ | $0.05$ | $0.10$ | $0.55$ | $0.11$ | $0.19$ |
+
+Our estimation with a random initial guess, as in the paper:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+|$x_1$|$0.401$|$0.056$|$0.049$|$0.495$|$0$|
+|$x_2$|$0.1$|$0.641$|$0.01$|$0.249$|$0$|
+|$x_3$|$0.052$|$0.201$|$0.647$|$0.1$|$0.001$|
+
+
+Our estimation with an initial guess matching the results from the paper:
+
+|$p_{it}(x)$ | $i_1$ | $i_2$ | $i_3$ | $i_4$ | $i_5$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|:----------:|
+|$0.399$|$0.263$|$0.037$|$0.3$|$0.002$|
+|$0.102$|$0.834$|$0.01$|$0.053$|$0.001$|
+|$0.108$|$0.272$|$0.505$|$0.115$|$0.001$|
+
+Overall we find that the results are similar to the one we obtained when we just used the Chicago subsample.
+
+* **Preference Parameter Estimates**
+
+The estimates of the parameters of the utility functions of the different household types for the joint NYC and Chicago model are summarized.
+
+|         | $\alpha_i$ | $\phi_i$ | $\eta_i$ | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|
+|$i=1$|$1.33$|$9.31$|$0.45$|$-1.91$|
+|$i=2$|$2.34$|$3.23$|$1.56$|$-1.12$|
+|$i=3$|$2.77$|$2.13$|$4.78$|$-1.13$|
+|$i=4$|$1.01$|$7.32$|$1.11$|$-1.43$|
+|$i=5$|$1.87$|$5.65$|$2.38$|$-1.23$|
+
+Our estimation with a random initial guess, as in the paper:
+
+|         | $\alpha_i$ | $\phi_i$ | $\eta_i$ | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|
+|$i=1$|$88.05$|$0.04$|$11628.12$|$-0.01$|
+|$i=2$|$78.14$|$0.10$|$1874.19$|$-0.02$|
+|$i=3$|$84.88$|$0.06$|$1871.78$|$-0.02$|
+|$i=4$|$81.65$|$0.05$|$1873.97$|$-0.08$|
+|$i=5$|$231.29$|$0.05$|$5720.20$|$-0.06$|
+
+Our estimation with an initial guess matching the results from the paper:
+
+|         | $\alpha_i$ | $\phi_i$ | $\eta_i$ | $\gamma_i$ |
+|:-------:|:----------:|:--------:|:--------:|:----------:|
+|$i=1$|$1.35$|$11.59$|$4792.95$|$-1.75$|
+|$i=2$|$1.75$|$156.03$|$34.39$|$-0.80$|
+|$i=3$|$3.01$|$156.94$|$204.46$|$-1.03$|
+|$i=4$|$1.85$|$156.44$|$31.23$|$-0.99$|
+|$i=5$|$1.72$|$12.79$|$5210.65$|$-1.95$|
+
+Overall we find that the results are similar to the one we obtained when we just used the Chicago subsample.
+
+
+
